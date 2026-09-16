@@ -1,239 +1,174 @@
 <template>
   <main class="login-page">
+    <div class="login-background"></div>
 
-    <section class="login-left">
+    <section class="login-content">
 
-      <div class="brand">
-        <div class="brand-logo">
-          <img
-            src="../assets/washup-logo.png"
-            alt="WashUp logo"
-          />
-        </div>
+      <img
+        src="../assets/WashUP.png"
+        alt="WashUP Logo"
+        class="washup-logo"
+      />
 
-        <div class="brand-text">
-          <h1>WashUp</h1>
-          <p>Laundry Management System</p>
-        </div>
-      </div>
+      <div class="login-card">
 
+        <div class="login-header">
+          <h1>Welcome Back</h1>
 
-      <div class="illustration">
-        <img
-          src="../assets/washup-logo.png"
-          alt="Laundry machine illustration"
-        />
-      </div>
-
-
-      <div class="intro">
-        <h2>
-          Simple laundry management<br />
-          made easy.
-        </h2>
-
-        <p>
-          Manage orders, track laundry status, and keep every
-          transaction organized in one place.
-        </p>
-      </div>
-
-    </section>
-
-
-    <section class="login-right">
-
-      <div class="login-content">
-
-        <!-- Login Card -->
-        <div class="login-card">
-
-          <p class="description">
+          <p>
             Sign in to manage your laundry orders.
           </p>
-
-
-          <form @submit.prevent="handleLogin">
-
-            <div class="form-group">
-              <label for="username">
-                Username
-              </label>
-
-              <input
-                id="username"
-                v-model.trim="form.username"
-                type="text"
-                placeholder="Enter your username"
-                autocomplete="username"
-                required
-              />
-            </div>
-
-            <div class="form-group password-group">
-
-              <label for="password">
-                Password
-              </label>
-
-              <div class="password-wrapper">
-
-                <input
-                  id="password"
-                  v-model="form.password"
-                  :type="showPassword ? 'text' : 'password'"
-                  placeholder="Enter your password"
-                  autocomplete="current-password"
-                  required
-                />
-
-                <button
-                  type="button"
-                  class="password-toggle"
-                  @click="showPassword = !showPassword"
-                  :aria-label="
-                    showPassword
-                      ? 'Hide password'
-                      : 'Show password'
-                  "
-                >
-
-                  <svg
-                    v-if="!showPassword"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M2.5 12s3.5-5.5 9.5-5.5S21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12Z"
-                    />
-
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="2.5"
-                    />
-                  </svg>
-
-                  <!-- Eye closed -->
-                  <svg
-                    v-else
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M3 3l18 18"
-                    />
-
-                    <path
-                      d="M10.6 6.7C11.05 6.57 11.52 6.5 12 6.5c6 0 9.5 5.5 9.5 5.5a17 17 0 0 1-3.1 3.45"
-                    />
-
-                    <path
-                      d="M6.1 8.1C3.8 9.65 2.5 12 2.5 12s3.5 5.5 9.5 5.5c1.1 0 2.1-.18 3-.5"
-                    />
-                  </svg>
-
-                </button>
-
-              </div>
-            </div>
-
-
-            <p
-              v-if="errorMessage"
-              class="error-message"
-            >
-              {{ errorMessage }}
-            </p>
-
-
-            <button
-              type="submit"
-              class="login-button"
-              :disabled="isLoading"
-            >
-              {{ isLoading ? 'Logging in...' : 'Login' }}
-            </button>
-
-          </form>
-
         </div>
 
+        <form @submit.prevent="handleLogin">
+
+          <div class="form-group">
+            <label for="username">
+              Username
+            </label>
+
+            <input
+              id="username"
+              v-model="username"
+              type="text"
+              placeholder="Enter your username"
+              autocomplete="username"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password">
+              Password
+            </label>
+
+            <div class="password-wrapper">
+
+              <input
+                id="password"
+                v-model="password"
+                :type="showPassword ? 'text' : 'password'"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required
+              />
+
+              <button
+                type="button"
+                class="password-toggle"
+                @click="togglePassword"
+                :aria-label="
+                  showPassword
+                    ? 'Hide password'
+                    : 'Show password'
+                "
+              >
+                <svg
+                  v-if="!showPassword"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M2.062 12.348a1 1 0 0 1 0-.696
+                    C3.248 7.102 7.398 4 12 4
+                    c4.602 0 8.752 3.102 9.938 7.652
+                    a1 1 0 0 1 0 .696
+                    C20.752 16.898 16.602 20 12 20
+                    c-4.602 0-8.752-3.102-9.938-7.652Z"
+                  />
+
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="3"
+                  />
+                </svg>
+
+                <svg
+                  v-else
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M3 3l18 18" />
+
+                  <path
+                    d="M10.58 10.58a2 2 0 0 0 2.84 2.84"
+                  />
+
+                  <path
+                    d="M9.88 4.24A9.77 9.77 0 0 1 12 4
+                    c4.6 0 8.75 3.1 9.94 7.65
+                    a1 1 0 0 1 0 .7
+                    10.3 10.3 0 0 1-4.2 5.06"
+                  />
+
+                  <path
+                    d="M6.61 6.61a10.4 10.4 0 0 0-4.55 5.04
+                    1 1 0 0 0 0 .7
+                    C3.25 16.9 7.4 20 12 20
+                    a9.9 9.9 0 0 0 4.39-1.02"
+                  />
+                </svg>
+              </button>
+
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="login-button"
+            :disabled="loading"
+          >
+            {{ loading ? 'Logging in...' : 'Login' }}
+          </button>
+
+        </form>
 
         <p class="authorized-message">
           For authorized laundry shop staff only.
         </p>
 
       </div>
-
     </section>
-
   </main>
 </template>
 
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 
-const form = reactive({
-  username: '',
-  password: ''
-})
+const username = ref('')
+const password = ref('')
 
 const showPassword = ref(false)
-const isLoading = ref(false)
-const errorMessage = ref('')
+const loading = ref(false)
 
+const togglePassword = () => {
+  showPassword.value = !showPassword.value
+}
 
-async function handleLogin() {
-  errorMessage.value = ''
-
-  if (!form.username || !form.password) {
-    errorMessage.value =
-      'Please enter your username and password.'
-    return
-  }
-
-  isLoading.value = true
+const handleLogin = async () => {
+  loading.value = true
 
   try {
+    // Temporary behavior.
+    // Your backend/API will go here later.
+    console.log('Username:', username.value)
+    console.log('Password:', password.value)
 
-      const response = await fetch(
-        'http://localhost:3000/api/login',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            username: form.username,
-            password: form.password
-          })
-        }
-      )
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.message)
-      }
-
-    console.log('Login submitted')
-
-    await new Promise(resolve =>
+    await new Promise((resolve) => {
       setTimeout(resolve, 800)
-    )
+    })
 
-  } catch (error) {
-
-    errorMessage.value =
-      error.message ||
-      'Something went wrong. Please try again.'
-
+    alert('Login submitted!')
   } finally {
-
-    isLoading.value = false
-
+    loading.value = false
   }
 }
 </script>
@@ -242,422 +177,186 @@ async function handleLogin() {
 <style scoped>
 
 .login-page {
-  width: 100%;
-  min-height: 100vh;
-
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-
-  background: #f7f9fb;
-}
-
-
-.login-left {
   position: relative;
-
-  min-height: 100vh;
-
-  background: #23809b;
-  color: white;
-
-  padding: 42px 6%;
-}
-
-.brand {
-  position: absolute;
-
-  top: 42px;
-  left: 6%;
-
-  display: flex;
-  align-items: center;
-
-  gap: 10px;
-}
-
-.brand-logo {
-  width: 40px;
-  height: 40px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: white;
-
-  border-radius: 9px;
-
-  overflow: hidden;
-}
-
-.brand-logo img {
-  width: 30px;
-  height: 30px;
-
-  object-fit: contain;
-}
-
-.brand-text h1 {
-  margin: 0;
-
-  font-size: 21px;
-  line-height: 1;
-
-  font-weight: 700;
-}
-
-.brand-text p {
-  margin: 5px 0 0;
-
-  font-size: 10px;
-  line-height: 1;
-
-  opacity: 0.9;
-}
-
-.illustration {
-  position: absolute;
-
-  top: 43%;
-  left: 50%;
-
-  width: min(400px, 32vw);
-  height: min(400px, 32vw);
-
-  transform: translate(-50%, -50%);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: white;
-
-  border-radius: 50%;
-}
-
-.illustration img {
   width: 100%;
-  height: 100%;
-
-  object-fit: contain;
-}
-
-.intro {
-  position: absolute;
-
-  left: 6%;
-  bottom: 55px;
-
-  width: 88%;
-  max-width: 520px;
-}
-
-.intro h2 {
-  margin: 0 0 15px;
-
-  font-size: clamp(23px, 2vw, 30px);
-  line-height: 1.22;
-
-  font-weight: 700;
-}
-
-.intro p {
-  max-width: 500px;
-
-  margin: 0;
-
-  font-size: 12px;
-  line-height: 1.65;
-
-  opacity: 0.92;
-}
-
-
-.login-right {
   min-height: 100vh;
-
+  overflow: hidden;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-
-  padding: 42px 6%;
 }
 
+.login-background {
+  position: absolute;
+  inset: 0;
+  background-image: url('../assets/loginbg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 
 .login-content {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  max-width: 430px;
-  margin-top: 160px;
-
+  max-width: 520px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 32px 24px;
 }
 
+.washup-logo {
+  display: block;
+  width: 350px;
+  max-width: 80vw;
+  height: auto;
+  margin-bottom: 30px;
+}
 
 .login-card {
   width: 100%;
-
-  padding: 32px 30px 30px;
-
+  max-width: 400px;
+  padding: 28px 30px 24px;
   background: #ffffff;
-
-  border: 1px solid #e0e6eb;
-
-  border-radius: 11px;
-
+  border-radius: 14px;
+  border-top: 3px solid #2699b9;
   box-shadow:
-    0 3px 10px rgba(0, 0, 0, 0.035);
+    0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
-
-.description {
-  margin: 0 0 24px;
-
-  color: #667c98;
-
-  font-size: 12px;
-  line-height: 1.5;
+.login-header h1 {
+  margin: 0 0 5px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #182238;
 }
 
+.login-header p {
+  margin: 0 0 20px;
+
+  font-size: 11px;
+
+  color: #75839b;
+}
 
 .form-group {
-  margin-bottom: 21px;
+  margin-bottom: 18px;
 }
 
 .form-group label {
   display: block;
-
-  margin-bottom: 8px;
-
-  color: #40516a;
-
-  font-size: 12px;
+  margin-bottom: 7px;
+  font-size: 10px;
   font-weight: 600;
+  color: #344054;
 }
-
 
 .form-group input {
   width: 100%;
-  height: 39px;
-
-  padding: 0 12px;
-
-  border: 1px solid #d4dde6;
+  height: 34px;
+  padding: 0 11px;
+  box-sizing: border-box;
+  border: 1px solid #d9e0e8;
   border-radius: 6px;
-
-  background: #ffffff;
-
-  color: #43536a;
-
-  font-size: 11px;
-
+  background: #f8fafc;
+  font-family: inherit;
+  font-size: 10px;
+  color: #344054;
   outline: none;
-
   transition:
     border-color 0.2s ease,
+    background 0.2s ease,
     box-shadow 0.2s ease;
 }
 
 .form-group input::placeholder {
-  color: #a6b1bf;
+  color: #a5b1c2;
 }
 
 .form-group input:focus {
-  border-color: #23809b;
-
+  background: #ffffff;
+  border-color: #2699b9;
   box-shadow:
-    0 0 0 3px rgba(35, 128, 155, 0.1);
+    0 0 0 2px rgba(38, 153, 185, 0.12);
 }
-
 
 .password-wrapper {
   position: relative;
-
-  width: 100%;
 }
 
 .password-wrapper input {
-  padding-right: 42px;
+  padding-right: 40px;
 }
-
 
 .password-toggle {
   position: absolute;
-
   top: 50%;
   right: 9px;
-
-  width: 27px;
-  height: 27px;
-
+  width: 24px;
+  height: 24px;
   padding: 0;
-
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-
-  transform: translateY(-50%);
-
   border: none;
-
   background: transparent;
-
-  color: #8ca0b5;
-
+  color: #8b99ac;
   cursor: pointer;
-}
-
-.password-toggle:hover {
-  color: #23809b;
 }
 
 .password-toggle svg {
-  width: 17px;
-  height: 17px;
-
-  fill: none;
-
-  stroke: currentColor;
-
-  stroke-width: 1.5;
-
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  width: 15px;
+  height: 15px;
 }
-
-.error-message {
-  margin: -5px 0 14px;
-
-  color: #c0392b;
-
-  font-size: 10px;
-}
-
 
 .login-button {
   width: 100%;
-  height: 39px;
-
+  height: 34px;
+  margin-top: 2px;
   border: none;
-  border-radius: 6px;
+  border-radius: 7px;
+  background: linear-gradient(
+    135deg,
+    #2087a6,
+    #269dbd
+  );
 
-  background: #23809b;
-
-  color: white;
-
-  font-size: 12px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 10px;
   font-weight: 600;
-
   cursor: pointer;
-
+  box-shadow:
+    0 4px 9px rgba(32, 135, 166, 0.25);
   transition:
-    background 0.2s ease,
-    transform 0.1s ease;
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    opacity 0.15s ease;
 }
 
-.login-button:hover {
-  background: #1d7088;
+.login-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 6px 12px rgba(32, 135, 166, 0.3);
 }
 
-.login-button:active {
-  transform: scale(0.99);
+.login-button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .login-button:disabled {
   opacity: 0.65;
-
   cursor: not-allowed;
 }
 
-
 .authorized-message {
-  margin: 15px 0 0;
-
-  color: #a5b2c1;
-
-  font-size: 10px;
-
+  margin: 17px 0 0;
   text-align: center;
-}
-
-
-@media (max-width: 900px) {
-
-  .login-page {
-    grid-template-columns: 1fr;
-  }
-
-  .login-left {
-    min-height: 650px;
-  }
-
-  .brand {
-    left: 30px;
-  }
-
-  .illustration {
-    width: 270px;
-    height: 270px;
-  }
-
-  .intro {
-    left: 30px;
-    bottom: 40px;
-    width: calc(100% - 60px);
-  }
-
-  .login-right {
-    min-height: auto;
-
-    padding: 60px 30px;
-  }
-
-  .login-content {
-    margin-top: 0;
-  }
-}
-
-@media (max-width: 500px) {
-
-  .login-left {
-    min-height: 580px;
-
-    padding: 25px;
-  }
-
-  .brand {
-    top: 25px;
-    left: 25px;
-  }
-
-  .illustration {
-    width: 220px;
-    height: 220px;
-  }
-
-  .intro {
-    left: 25px;
-    bottom: 30px;
-
-    width: calc(100% - 50px);
-  }
-
-  .intro h2 {
-    font-size: 21px;
-  }
-
-  .intro p {
-    font-size: 11px;
-  }
-
-  .login-right {
-    padding: 40px 20px;
-  }
-
-  .login-card {
-    padding: 27px 22px;
-  }
+  font-size: 8px;
+  color: #a5b2c1;
 }
 
 </style>
