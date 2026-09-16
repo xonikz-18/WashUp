@@ -143,6 +143,8 @@
 <script setup>
 import { ref } from 'vue'
 
+const emit = defineEmits(['login-success'])
+
 const username = ref('')
 const password = ref('')
 
@@ -157,16 +159,38 @@ const handleLogin = async () => {
   loading.value = true
 
   try {
-    // Temporary behavior.
-    // Your backend/API will go here later.
-    console.log('Username:', username.value)
-    console.log('Password:', password.value)
-
-    await new Promise((resolve) => {
-      setTimeout(resolve, 800)
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username.value,
+        password: password.value,
+      }),
     })
 
-    alert('Login submitted!')
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Invalid username or password.')
+    }
+
+    console.log('Login successful:', data)
+
+    // Save the authentication token
+    localStorage.setItem('washup_token', data.token)
+
+    // Save the logged-in user
+    localStorage.setItem('washup_user', JSON.stringify(data.user))
+
+    // Tell App.vue that login succeeded
+    emit('login-success', data.user)
+
+  } catch (error) {
+    console.error('Login error:', error)
+    alert(error.message)
   } finally {
     loading.value = false
   }

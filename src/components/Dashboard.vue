@@ -77,7 +77,6 @@
           Sep 16, 2026 · Wednesday
         </div>
 
-
         <div class="user-info">
 
           <div class="user-details">
@@ -270,7 +269,6 @@
                 </tr>
               </thead>
 
-
               <tbody>
 
                 <tr
@@ -355,6 +353,8 @@ import {
   onBeforeUnmount
 } from 'vue'
 
+const emit = defineEmits(['logout'])
+
 import {
   Chart,
   BarController,
@@ -416,7 +416,6 @@ const createChart = () => {
     return
   }
 
-
   const labels = [
     'Mon',
     'Tue',
@@ -426,7 +425,6 @@ const createChart = () => {
     'Sat',
     'Sun'
   ]
-
 
   const data = {
     labels,
@@ -458,7 +456,6 @@ const createChart = () => {
         yAxisID: 'orders'
       },
 
-
       /*
        * Revenue
        */
@@ -487,7 +484,6 @@ const createChart = () => {
     ]
   }
 
-
   const config = {
 
     type: 'bar',
@@ -504,7 +500,6 @@ const createChart = () => {
         mode: 'index',
         intersect: false
       },
-
 
       plugins: {
 
@@ -540,7 +535,6 @@ const createChart = () => {
         }
 
       },
-
 
       scales: {
 
@@ -627,7 +621,6 @@ const createChart = () => {
 
   }
 
-
   ordersChart = new Chart(
     chartCanvas.value,
     config
@@ -638,8 +631,27 @@ const handleNavigation = (page) => {
   console.log(`Navigate to: ${page}`)
 }
 
-const handleLogout = () => {
-  console.log('Logout clicked')
+const handleLogout = async () => {
+  const token = localStorage.getItem('washup_token')
+
+  try {
+    if (token) {
+      await fetch('/api/logout', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+    }
+  } catch (error) {
+    console.error('Logout error:', error)
+  } finally {
+    localStorage.removeItem('washup_token')
+    localStorage.removeItem('washup_user')
+
+    emit('logout')
+  }
 }
 
 const viewOrder = (order) => {
