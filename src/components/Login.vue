@@ -20,8 +20,38 @@
           </p>
         </div>
 
-        <form @submit.prevent="handleLogin">
+        <!-- Error Notification -->
+        <div
+          v-if="errorMessage"
+          class="error-notification"
+          role="alert"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="9"
+            />
 
+            <path d="M12 8v4" />
+            <path d="M12 16h.01" />
+          </svg>
+
+          <span>{{ errorMessage }}</span>
+        </div>
+
+        <form
+          @submit.prevent="handleLogin"
+          novalidate
+        >
+
+          <!-- Username -->
           <div class="form-group">
             <label for="username">
               Username
@@ -33,10 +63,19 @@
               type="text"
               placeholder="Enter your username"
               autocomplete="username"
-              required
+              :class="{ 'input-error': usernameError }"
+              @input="clearErrors"
             />
+
+            <p
+              v-if="usernameError"
+              class="field-error"
+            >
+              {{ usernameError }}
+            </p>
           </div>
 
+          <!-- Password -->
           <div class="form-group">
             <label for="password">
               Password
@@ -50,7 +89,8 @@
                 :type="showPassword ? 'text' : 'password'"
                 placeholder="Enter your password"
                 autocomplete="current-password"
-                required
+                :class="{ 'input-error': passwordError }"
+                @input="clearErrors"
               />
 
               <button
@@ -63,8 +103,10 @@
                     : 'Show password'
                 "
               >
+
+                <!-- OPEN EYE = PASSWORD VISIBLE -->
                 <svg
-                  v-if="!showPassword"
+                  v-if="showPassword"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="none"
@@ -87,6 +129,7 @@
                   />
                 </svg>
 
+                <!-- CLOSED/SLASHED EYE = PASSWORD HIDDEN -->
                 <svg
                   v-else
                   xmlns="http://www.w3.org/2000/svg"
@@ -115,11 +158,20 @@
                     a9.9 9.9 0 0 0 4.39-1.02"
                   />
                 </svg>
+
               </button>
 
             </div>
+
+            <p
+              v-if="passwordError"
+              class="field-error"
+            >
+              {{ passwordError }}
+            </p>
           </div>
 
+          <!-- Login Button -->
           <button
             type="submit"
             class="login-button"
@@ -151,48 +203,118 @@ const password = ref('')
 const showPassword = ref(false)
 const loading = ref(false)
 
+const errorMessage = ref('')
+const usernameError = ref('')
+const passwordError = ref('')
+
+
 const togglePassword = () => {
   showPassword.value = !showPassword.value
 }
 
+
+const clearErrors = () => {
+  errorMessage.value = ''
+  usernameError.value = ''
+  passwordError.value = ''
+}
+
+
 const handleLogin = async () => {
+
+  // Clear previous errors
+  clearErrors()
+
+  // Check empty fields
+  if (!username.value.trim() && !password.value) {
+    usernameError.value = 'Username is required.'
+    passwordError.value = 'Password is required.'
+    errorMessage.value = 'Please enter your admin username and password.'
+    return
+  }
+
+  if (!username.value.trim()) {
+    usernameError.value = 'Username is required.'
+    errorMessage.value = 'Please enter your admin username.'
+    return
+  }
+
+  if (!password.value) {
+    passwordError.value = 'Password is required.'
+    errorMessage.value = 'Please enter your admin password.'
+    return
+  }
+
+
   loading.value = true
 
   try {
+
     const response = await fetch('/api/login', {
       method: 'POST',
+
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
+
       body: JSON.stringify({
         username: username.value,
         password: password.value,
       }),
     })
 
+
     const data = await response.json()
 
+
     if (!response.ok) {
-      throw new Error(data.message || 'Invalid username or password.')
+      throw new Error(
+        data.message || 'Invalid admin username or password.'
+      )
     }
+
 
     console.log('Login successful:', data)
 
     // Save the authentication token
-    localStorage.setItem('washup_token', data.token)
+    localStorage.setItem(
+      'washup_token',
+      data.token
+    )
 
     // Save the logged-in user
-    localStorage.setItem('washup_user', JSON.stringify(data.user))
+    localStorage.setItem(
+      'washup_user',
+      JSON.stringify(data.user)
+    )
 
     // Tell App.vue that login succeeded
     emit('login-success', data.user)
 
+
   } catch (error) {
+
     console.error('Login error:', error)
-    alert(error.message)
-  } finally {
+
+    // Stop loading immediately
     loading.value = false
+
+    // Show error notification
+    errorMessage.value =
+      'Invalid admin username or password.'
+
+    // Make both fields red
+    usernameError.value =
+      'Invalid username or password.'
+
+    passwordError.value =
+      'Invalid username or password.'
+
+  } finally {
+
+    loading.value = false
+
   }
 }
 </script>
@@ -258,11 +380,53 @@ const handleLogin = async () => {
 
 .login-header p {
   margin: 0 0 20px;
-
   font-size: 11px;
-
   color: #75839b;
 }
+
+
+/* ============================= */
+/* ERROR NOTIFICATION             */
+/* ============================= */
+
+.error-notification {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 18px;
+  padding: 10px 11px;
+
+  background: #fff1f2;
+  border: 1px solid #fca5a5;
+  border-radius: 7px;
+
+  color: #dc2626;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  animation: errorSlideIn 0.2s ease;
+}
+
+.error-notification svg {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+}
+
+@keyframes errorSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 .form-group {
   margin-bottom: 18px;
@@ -281,13 +445,18 @@ const handleLogin = async () => {
   height: 34px;
   padding: 0 11px;
   box-sizing: border-box;
+
   border: 1px solid #d9e0e8;
   border-radius: 6px;
+
   background: #f8fafc;
+
   font-family: inherit;
   font-size: 10px;
   color: #344054;
+
   outline: none;
+
   transition:
     border-color 0.2s ease,
     background 0.2s ease,
@@ -300,10 +469,42 @@ const handleLogin = async () => {
 
 .form-group input:focus {
   background: #ffffff;
+
   border-color: #2699b9;
+
   box-shadow:
     0 0 0 2px rgba(38, 153, 185, 0.12);
 }
+
+
+/* ============================= */
+/* RED ERROR INPUT                */
+/* ============================= */
+
+.form-group input.input-error {
+  border-color: #ef4444;
+  background: #fff7f7;
+}
+
+.form-group input.input-error:focus {
+  border-color: #ef4444;
+
+  box-shadow:
+    0 0 0 2px rgba(239, 68, 68, 0.12);
+}
+
+.field-error {
+  margin: 5px 0 0;
+
+  font-size: 8px;
+  color: #dc2626;
+  font-weight: 500;
+}
+
+
+/* ============================= */
+/* PASSWORD                       */
+/* ============================= */
 
 .password-wrapper {
   position: relative;
@@ -317,17 +518,27 @@ const handleLogin = async () => {
   position: absolute;
   top: 50%;
   right: 9px;
+
   width: 24px;
   height: 24px;
   padding: 0;
+
   transform: translateY(-50%);
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   border: none;
   background: transparent;
+
   color: #8b99ac;
+
   cursor: pointer;
+}
+
+.password-toggle:hover {
+  color: #2699b9;
 }
 
 .password-toggle svg {
@@ -335,12 +546,19 @@ const handleLogin = async () => {
   height: 15px;
 }
 
+
+/* ============================= */
+/* LOGIN BUTTON                   */
+/* ============================= */
+
 .login-button {
   width: 100%;
   height: 34px;
   margin-top: 2px;
+
   border: none;
   border-radius: 7px;
+
   background: linear-gradient(
     135deg,
     #2087a6,
@@ -348,12 +566,16 @@ const handleLogin = async () => {
   );
 
   color: #ffffff;
+
   font-family: inherit;
   font-size: 10px;
   font-weight: 600;
+
   cursor: pointer;
+
   box-shadow:
     0 4px 9px rgba(32, 135, 166, 0.25);
+
   transition:
     transform 0.15s ease,
     box-shadow 0.15s ease,
@@ -376,9 +598,16 @@ const handleLogin = async () => {
   cursor: not-allowed;
 }
 
+
+/* ============================= */
+/* AUTHORIZED MESSAGE             */
+/* ============================= */
+
 .authorized-message {
   margin: 17px 0 0;
+
   text-align: center;
+
   font-size: 8px;
   color: #a5b2c1;
 }
