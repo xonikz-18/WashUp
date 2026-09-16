@@ -235,7 +235,7 @@
               </label>
 
               <select
-                v-model="form.service"
+                v-model="form.serviceId"
                 :class="{ error: errors.service }"
               >
 
@@ -243,12 +243,12 @@
                   Select service
                 </option>
 
-                <option value="Wash Only">
-                  Wash Only - ₱25/kg
-                </option>
-
-                <option value="Wash & Dry">
-                  Wash &amp; Dry - ₱50/kg
+                <option
+                  v-for="service in services"
+                  :key="service.id"
+                  :value="service.id"
+                >
+                  {{ service.service_name }} - ₱{{ formatPrice(service.price_per_kg) }}/kg
                 </option>
 
               </select>
@@ -369,7 +369,7 @@
               </div>
 
               <strong class="addon-price">
-                ₱15.00 each
+                ₱{{ formatPrice(addons.fabricConditioner.price) }} each
               </strong>
 
             </div>
@@ -431,7 +431,7 @@
               </div>
 
               <strong class="addon-price">
-                ₱20.00 each
+                ₱{{ formatPrice(addons.extraDrying.price) }} each
               </strong>
 
             </div>
@@ -531,7 +531,7 @@
 
               <span>
                 Base Service -
-                {{ form.service || 'No service' }}
+                {{ selectedService?.service_name || 'No service' }}
                 {{ form.weight > 0 ? `${form.weight}kg` : '' }}
               </span>
 
@@ -610,11 +610,19 @@
             type="button"
             class="create-button"
             @click="createOrder"
+            :disabled="creatingOrder"
           >
-            Create Order
+            {{ creatingOrder ? 'Creating Order...' : 'Create Order' }}
           </button>
 
         </div>
+
+        <span
+          v-if="apiError"
+          class="error-message"
+        >
+          {{ apiError }}
+        </span>
 
       </div>
 
@@ -635,6 +643,7 @@
           type="button"
           class="close-modal"
           @click="showReceipt = false"
+          aria-label="Close receipt"
         >
           ×
         </button>
@@ -642,125 +651,135 @@
 
         <div class="receipt-header">
 
-          <div class="receipt-logo">
-            <img
-              src="../assets/droplet.png"
-              alt="WashUp"
-            />
+          <div class="receipt-title">
+            <span class="receipt-success-icon">✓</span>
 
-            <img
-              src="../assets/washupblue.png"
-              alt="WashUp"
-            />
+            <div>
+              <h2>Order Receipt</h2>
+              <p>Ticket: {{ createdOrder.order_number }}</p>
+            </div>
           </div>
 
-          <p>
-            Laundry Shop Management System
-          </p>
-
         </div>
 
 
-        <div class="receipt-divider"></div>
-
-
-        <div class="receipt-order-number">
-          {{ orderNumber }}
-        </div>
+        <div class="receipt-divider teal-divider"></div>
 
 
         <div class="receipt-details">
 
           <div>
-            <span>Customer</span>
-            <strong>{{ form.customerName }}</strong>
+            <span>Customer Name</span>
+            <strong>{{ createdOrder.customer_name }}</strong>
           </div>
 
           <div>
-            <span>Phone</span>
-            <strong>{{ form.phone }}</strong>
+            <span>Phone Number</span>
+            <strong>{{ createdOrder.phone_number }}</strong>
           </div>
 
           <div>
-            <span>Service</span>
-            <strong>{{ form.service }}</strong>
+            <span>Main Service</span>
+            <strong>{{ createdOrder.service.service_name }}</strong>
           </div>
 
           <div>
-            <span>Weight</span>
-            <strong>{{ form.weight }} kg</strong>
+            <span>Load Weight</span>
+            <strong>{{ createdOrder.weight }} kg</strong>
+          </div>
+
+        </div>
+
+
+        <div class="receipt-divider dashed-divider"></div>
+
+
+        <section class="receipt-section">
+          <h3>ADD-ONS SELECTED</h3>
+
+          <div
+            v-for="addon in createdOrder.addons"
+            :key="addon.id"
+            class="receipt-addon-row"
+          >
+            <span>
+              {{ addon.addon_name }}
+              <small>x{{ addon.quantity }}</small>
+            </span>
+
+            <strong>
+              ₱{{ formatPrice(addon.addon_price * addon.quantity) }}
+            </strong>
+          </div>
+
+          <p
+            v-if="createdOrder.addons.length === 0"
+            class="receipt-empty-addons"
+          >
+            No add-ons selected.
+          </p>
+
+        </section>
+
+
+        <div class="receipt-divider dashed-divider"></div>
+
+
+        <section class="receipt-section receipt-cost-breakdown">
+          <h3>COST BREAKDOWN</h3>
+
+          <div class="receipt-cost-row">
+            <span>
+              Base Service ({{ createdOrder.service.service_name }} {{ createdOrder.weight }}kg)
+            </span>
+
+            <strong>
+              ₱{{ formatPrice(receiptServiceCost) }}
+            </strong>
+          </div>
+
+          <div
+            v-for="addon in createdOrder.addons"
+            :key="`cost-${addon.id}`"
+            class="receipt-cost-row"
+          >
+            <span>{{ addon.addon_name }}</span>
+
+            <strong>
+              ₱{{ formatPrice(addon.addon_price * addon.quantity) }}
+            </strong>
+          </div>
+
+          <div class="receipt-total">
+
+            <span>Total Amount</span>
+
+            <strong>
+              ₱{{ formatPrice(createdOrder.total_price) }}
+            </strong>
+
+          </div>
+
+        </section>
+
+
+        <div class="receipt-divider dashed-divider"></div>
+
+
+        <div class="receipt-footer-details">
+
+          <div>
+            <span>Order Status</span>
+            <strong class="receipt-status">
+              <span class="receipt-status-dot"></span>
+              {{ createdOrder.status }}
+            </strong>
           </div>
 
           <div>
             <span>Estimated Pickup</span>
-            <strong>
-              {{ formattedPickup }}
-            </strong>
+            <strong>{{ formatPickup(createdOrder.estimated_pickup) }}</strong>
           </div>
-
-          <div>
-            <span>Status</span>
-            <strong class="receipt-status">
-              Pending
-            </strong>
-          </div>
-
-        </div>
-
-
-        <div class="receipt-divider"></div>
-
-
-        <div class="receipt-items">
-
-          <div>
-            <span>
-              Base Service
-            </span>
-
-            <strong>
-              ₱{{ formatPrice(baseServiceCost) }}
-            </strong>
-          </div>
-
-          <div
-            v-if="fabricConditionerCost > 0"
-          >
-            <span>
-              Fabric Conditioner ×
-              {{ addons.fabricConditioner.quantity }}
-            </span>
-
-            <strong>
-              ₱{{ formatPrice(fabricConditionerCost) }}
-            </strong>
-          </div>
-
-          <div
-            v-if="extraDryingCost > 0"
-          >
-            <span>
-              Extra Drying ×
-              {{ addons.extraDrying.quantity }}
-            </span>
-
-            <strong>
-              ₱{{ formatPrice(extraDryingCost) }}
-            </strong>
-          </div>
-
-        </div>
-
-
-        <div class="receipt-total">
-
-          <span>
-            Total
-          </span>
-
-          <strong>
-            ₱{{ formatPrice(totalPrice) }}
-          </strong>
 
         </div>
 
@@ -769,21 +788,18 @@
 
           <button
             type="button"
-            class="receipt-close"
-            @click="showReceipt = false"
+            class="receipt-print"
+            @click="$event.currentTarget.ownerDocument.defaultView.print()"
           >
-            Close
-          </button>
-
-          <button
-            type="button"
-            class="receipt-orders"
-            @click="goTo('Orders')"
-          >
-            Back to Orders
+            ▣
+            Print Receipt
           </button>
 
         </div>
+
+        <p class="receipt-note">
+          Closing this window will not cancel the order.
+        </p>
 
       </div>
 
@@ -794,7 +810,7 @@
 
 
 <script setup>
-import { computed, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 
 const emit = defineEmits([
   'navigate',
@@ -806,7 +822,12 @@ const emit = defineEmits([
    ORDER NUMBER
 ========================= */
 
-const orderNumber = ref('WU-0130')
+const services = ref([])
+const createdOrder = ref(null)
+const creatingOrder = ref(false)
+const apiError = ref('')
+
+const orderNumber = computed(() => createdOrder.value?.order_number || '—')
 
 
 /* =========================
@@ -816,7 +837,7 @@ const orderNumber = ref('WU-0130')
 const form = reactive({
   customerName: '',
   phone: '',
-  service: 'Wash & Dry',
+  serviceId: '',
   weight: 5,
   pickupDate: '2026-05-18',
   pickupTime: '10:00'
@@ -830,15 +851,17 @@ const form = reactive({
 const addons = reactive({
 
   fabricConditioner: {
+    id: null,
     selected: true,
     quantity: 1,
-    price: 15
+    price: 0
   },
 
   extraDrying: {
+    id: null,
     selected: true,
     quantity: 1,
-    price: 20
+    price: 0
   }
 
 })
@@ -866,22 +889,17 @@ const errors = reactive({
 
 const showReceipt = ref(false)
 
+const selectedService = computed(() => {
+  return services.value.find((service) => service.id === Number(form.serviceId))
+})
+
 
 /* =========================
    SERVICE PRICE
 ========================= */
 
 const servicePrice = computed(() => {
-
-  if (form.service === 'Wash Only') {
-    return 25
-  }
-
-  if (form.service === 'Wash & Dry') {
-    return 50
-  }
-
-  return 0
+  return Number(selectedService.value?.price_per_kg || 0)
 })
 
 
@@ -973,6 +991,14 @@ const formattedPickup = computed(() => {
 
 })
 
+const receiptServiceCost = computed(() => {
+  if (!createdOrder.value) {
+    return 0
+  }
+
+  return createdOrder.value.service.price_per_kg * createdOrder.value.weight
+})
+
 
 /* =========================
    FORMAT PRICE
@@ -982,6 +1008,22 @@ const formatPrice = (value) => {
 
   return Number(value || 0).toFixed(2)
 
+}
+
+const formatPickup = (value) => {
+  const date = new Date(value)
+
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+
+  return date.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit'
+  })
 }
 
 
@@ -1050,7 +1092,7 @@ const validateForm = () => {
   }
 
 
-  if (!form.service) {
+  if (!form.serviceId) {
 
     errors.service =
       'Please select a service.'
@@ -1099,13 +1141,131 @@ const validateForm = () => {
    CREATE ORDER
 ========================= */
 
-const createOrder = () => {
+const authHeaders = () => {
+  const token = localStorage.getItem('washup_token')
 
-  if (!validateForm()) {
+  return {
+    Accept: 'application/json',
+    Authorization: `Bearer ${token}`
+  }
+}
+
+const loadOrderOptions = async () => {
+  try {
+    const [servicesResponse, addonsResponse] = await Promise.all([
+      fetch('/api/services', { headers: authHeaders() }),
+      fetch('/api/addons', { headers: authHeaders() })
+    ])
+
+    if (servicesResponse.status === 401 || addonsResponse.status === 401) {
+      apiError.value = 'Your session has expired. Please log in again.'
+      return
+    }
+
+    if (!servicesResponse.ok || !addonsResponse.ok) {
+      throw new Error('Could not load order options.')
+    }
+
+    services.value = await servicesResponse.json()
+    const addonOptions = await addonsResponse.json()
+
+    const washAndDry = services.value.find((service) => service.service_name === 'Wash & Dry')
+    form.serviceId = washAndDry?.id || services.value[0]?.id || ''
+
+    const fabricConditioner = addonOptions.find((addon) => addon.addon_name === 'Fabric Conditioner')
+    const extraDrying = addonOptions.find((addon) => addon.addon_name === 'Extra Drying')
+
+    if (fabricConditioner) {
+      addons.fabricConditioner.id = fabricConditioner.id
+      addons.fabricConditioner.price = Number(fabricConditioner.addon_price)
+    }
+
+    if (extraDrying) {
+      addons.extraDrying.id = extraDrying.id
+      addons.extraDrying.price = Number(extraDrying.addon_price)
+    }
+  } catch (error) {
+    console.error('Order options error:', error)
+    apiError.value = 'Unable to load services and add-ons. Please try again.'
+  }
+}
+
+const showServerErrors = (serverErrors) => {
+  const fieldMap = {
+    customer_name: 'customerName',
+    phone_number: 'phone',
+    service_id: 'service',
+    weight: 'weight',
+    estimated_pickup: 'pickupDate'
+  }
+
+  Object.entries(serverErrors || {}).forEach(([field, messages]) => {
+    const formField = fieldMap[field]
+
+    if (formField) {
+      errors[formField] = messages[0]
+    }
+  })
+}
+
+const createOrder = async () => {
+
+  if (creatingOrder.value || !validateForm()) {
     return
   }
 
-  showReceipt.value = true
+  apiError.value = ''
+  creatingOrder.value = true
+
+  const selectedAddons = Object.values(addons)
+    .filter((addon) => addon.selected && addon.quantity > 0 && addon.id)
+    .map((addon) => ({
+      addon_id: addon.id,
+      quantity: addon.quantity
+    }))
+
+  try {
+    const response = await fetch('/api/orders', {
+      method: 'POST',
+      headers: {
+        ...authHeaders(),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        customer_name: form.customerName,
+        phone_number: form.phone,
+        service_id: form.serviceId,
+        weight: form.weight,
+        estimated_pickup: `${form.pickupDate}T${form.pickupTime}`,
+        addons: selectedAddons
+      })
+    })
+
+    const data = await response.json()
+
+    if (response.status === 401) {
+      apiError.value = 'Your session has expired. Please log in again.'
+      return
+    }
+
+    if (response.status === 422) {
+      showServerErrors(data.errors)
+      apiError.value = 'Please correct the highlighted fields and try again.'
+      return
+    }
+
+    if (!response.ok) {
+      throw new Error('Could not create the order.')
+    }
+
+    createdOrder.value = data
+    showReceipt.value = true
+  } catch (error) {
+    console.error('Create order error:', error)
+    apiError.value = 'Unable to create the order. Please check your connection and try again.'
+  } finally {
+    creatingOrder.value = false
+  }
 
 }
 
@@ -1119,6 +1279,10 @@ const goTo = (page) => {
   emit('navigate', page)
 
 }
+
+onMounted(() => {
+  loadOrderOptions()
+})
 
 
 /* =========================
@@ -2213,6 +2377,170 @@ const handleLogout = async () => {
   background: #2085a0;
 
   color: #ffffff;
+}
+
+
+/* Approved receipt design */
+.receipt-modal {
+  max-width: 480px;
+  padding: 31px 32px 12px;
+  border-radius: 15px;
+  box-shadow: 0 18px 45px rgba(16, 24, 40, 0.2);
+}
+
+.close-modal {
+  top: 31px;
+  right: 31px;
+  width: 29px;
+  height: 29px;
+  border-radius: 50%;
+  background: #f7f9fc;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.receipt-header {
+  text-align: left;
+}
+
+.receipt-title {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.receipt-success-icon {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #d8faf1;
+  color: #089b8b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.receipt-title h2 {
+  margin: 0;
+  color: #172033;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.receipt-title p {
+  margin: 3px 0 0;
+  color: #0e9f8e;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.receipt-divider.teal-divider {
+  height: 3px;
+  margin: 17px 0 18px;
+  border-radius: 4px;
+  background: #089b8b;
+}
+
+.receipt-divider.dashed-divider {
+  height: 1px;
+  margin: 16px 0;
+  border-top: 1px dashed #dbe3ec;
+  background: transparent;
+}
+
+.receipt-details > div,
+.receipt-addon-row,
+.receipt-cost-row,
+.receipt-footer-details > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 27px;
+}
+
+.receipt-details span,
+.receipt-addon-row span,
+.receipt-cost-row span,
+.receipt-footer-details span {
+  color: #667a99;
+  font-size: 11px;
+}
+
+.receipt-details strong,
+.receipt-addon-row strong,
+.receipt-cost-row strong,
+.receipt-footer-details strong {
+  color: #172033;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.receipt-section h3 {
+  margin: 0 0 7px;
+  color: #667a99;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.receipt-addon-row small {
+  display: inline-block;
+  margin-left: 7px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: #f1f5f9;
+  color: #667a99;
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.receipt-empty-addons {
+  margin: 0;
+  color: #667a99;
+  font-size: 10px;
+}
+
+.receipt-total {
+  margin-top: 7px;
+  padding-top: 11px;
+  border-top: 1px solid #e5eaf0;
+}
+
+.receipt-total span {
+  color: #172033;
+  font-size: 13px;
+}
+
+.receipt-total strong {
+  color: #089b8b;
+  font-size: 16px;
+}
+
+.receipt-actions {
+  display: block;
+  margin-top: 26px;
+}
+
+.receipt-print {
+  width: 100%;
+  height: 44px;
+  border: 1px solid #079e8e;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #079e8e;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.receipt-note {
+  margin: 13px 0 0;
+  color: #9aa9bd;
+  font-size: 9px;
+  text-align: center;
 }
 
 
