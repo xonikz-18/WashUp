@@ -1,350 +1,349 @@
 <template>
   <div class="dashboard">
 
-    <aside class="sidebar">
+<aside class="sidebar">
 
-      <div class="sidebar-logo">
-        <img src="../assets/droplet.png" alt="" class="logo-droplet"/>
-        <img src="../assets/washupblue.png" alt="WashUP" class="logo-text"/>
+  <div class="sidebar-logo">
+    <img src="../assets/droplet.png" alt="" class="logo-droplet"/>
+    <img src="../assets/washupblue.png" alt="WashUP" class="logo-text"/>
+  </div>
+
+  <nav class="sidebar-nav">
+
+    <button
+      class="nav-item active" type="button">
+      <img src="../assets/icondashboardblue.png" alt=""/>
+      <span>Dashboard</span>
+    </button>
+
+    <button
+      class="nav-item" type="button" @click="handleNavigation('Orders')">
+      <img src="../assets/iconordergray.png" alt=""/>
+      <span>Orders</span>
+    </button>
+
+    <button
+      class="nav-item"
+      type="button"
+      @click="handleNavigation('Services & Add-ons')"
+    >
+      <img
+        src="../assets/iconservicesgray.png"
+        alt=""
+      />
+
+      <span>Services &amp; Add-ons</span>
+    </button>
+
+    <button
+      class="nav-item"
+      type="button"
+      @click="handleNavigation('Reports')"
+    >
+      <img
+        src="../assets/iconreportsgray.png"
+        alt=""
+      />
+
+      <span>Reports</span>
+    </button>
+
+  </nav>
+
+  <div class="sidebar-bottom">
+
+    <button
+      class="nav-item logout"
+      type="button"
+      @click="handleLogout"
+    >
+      <img
+        src="../assets/iconlogoutgray.png"
+        alt=""
+      />
+
+      <span>Logout</span>
+    </button>
+
+  </div>
+
+</aside>
+
+<main class="main-content">
+
+  <header class="top-header">
+
+    <div class="date">
+      Sep 16, 2026 · Wednesday
+    </div>
+
+    <div class="user-info">
+
+      <div class="user-details">
+        <strong>Admin</strong>
+        <span>Shop Staff</span>
       </div>
 
-      <nav class="sidebar-nav">
+      <div class="user-avatar">
+        A
+      </div>
+
+    </div>
+
+  </header>
+
+  <div class="content-container">
+
+    <!-- Section title -->
+    <div class="section-heading">
+      <span>ORDER SUMMARY</span>
+    </div>
+
+    <section class="summary-grid">
+
+      <article class="summary-card">
+
+        <div class="card-top">
+          <span>Total Orders</span>
+
+          <div class="card-icon blue">
+            <img
+              src="../assets/icontotalorder.png"
+              alt=""
+            />
+          </div>
+        </div>
+
+        <div class="card-value">
+          156
+        </div>
+
+        <div class="card-description">
+          across all services
+        </div>
+
+      </article>
+
+      <article class="summary-card">
+
+        <div class="card-top">
+          <span>Total Revenue</span>
+
+          <div class="card-icon green">
+            <img
+              src="../assets/icontotalrevenue.png"
+              alt=""
+            />
+          </div>
+        </div>
+
+        <div class="card-value">
+          ₱48,520
+        </div>
+
+        <div class="card-description">
+          total collected
+        </div>
+
+      </article>
+
+      <article class="summary-card">
+
+        <div class="card-top">
+          <span>Claimed Orders</span>
+
+          <div class="card-icon claimed">
+            <img
+              src="../assets/iconclaimedorders.png"
+              alt=""
+            />
+          </div>
+        </div>
+
+        <div class="card-value">
+          89
+        </div>
+
+        <div class="card-description">
+          picked up by customers
+        </div>
+
+      </article>
+
+      <article class="summary-card">
+
+        <div class="card-top">
+          <span>Pending Orders</span>
+
+          <div class="card-icon pending">
+            <img
+              src="../assets/iconpendingorders.png"
+              alt=""
+            />
+          </div>
+        </div>
+
+        <div class="card-value">
+          67
+        </div>
+
+        <div class="card-description">
+          waiting for action
+        </div>
+
+      </article>
+
+    </section>
+
+    <section class="chart-card">
+
+      <div class="chart-header">
+
+        <div>
+          <h2>
+            Orders &amp; Revenue Over Time
+          </h2>
+
+          <p>
+            Last 7 days performance
+          </p>
+        </div>
+
+        <div class="chart-legend">
+
+          <div class="legend-item">
+            <span class="legend-line orders"></span>
+            <span>Orders</span>
+          </div>
+
+          <div class="legend-item">
+            <span class="legend-line revenue"></span>
+            <span>Revenue</span>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="chart-container">
+        <canvas ref="chartCanvas"></canvas>
+      </div>
+
+    </section>
+
+    <section class="orders-card">
+
+      <div class="orders-header">
+
+        <div>
+          <h2>Recent Orders</h2>
+
+          <p>
+            Latest Laundry Orders
+          </p>
+        </div>
 
         <button
-          class="nav-item active" type="button">
-          <img src="../assets/icondashboardblue.png" alt=""/>
-          <span>Dashboard</span>
-        </button>
-
-        <button
-          class="nav-item" type="button" @click="handleNavigation('Orders')">
-          <img src="../assets/iconordergray.png" alt=""/>
-          <span>Orders</span>
-        </button>
-
-        <button
-          class="nav-item"
           type="button"
-          @click="handleNavigation('Services & Add-ons')"
+          class="view-all"
+          @click="handleNavigation('Orders')"
         >
-          <img
-            src="../assets/iconservicesgray.png"
-            alt=""
-          />
-
-          <span>Services &amp; Add-ons</span>
-        </button>
-
-        <button
-          class="nav-item"
-          type="button"
-          @click="handleNavigation('Reports')"
-        >
-          <img
-            src="../assets/iconreportsgray.png"
-            alt=""
-          />
-
-          <span>Reports</span>
-        </button>
-
-      </nav>
-
-      <div class="sidebar-bottom">
-
-        <button
-          class="nav-item logout"
-          type="button"
-          @click="handleLogout"
-        >
-          <img
-            src="../assets/iconlogoutgray.png"
-            alt=""
-          />
-
-          <span>Logout</span>
+          View all orders
         </button>
 
       </div>
 
-    </aside>
+      <div class="table-wrapper">
 
-    <main class="main-content">
+        <table>
 
-      <header class="top-header">
+          <thead>
+            <tr>
+              <th>Order<br />Number</th>
+              <th>Customer<br />Name</th>
+              <th>Service</th>
+              <th>Weight</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
 
-        <div class="date">
-          Sep 16, 2026 · Wednesday
-        </div>
+          <tbody>
 
-        <div class="user-info">
-
-          <div class="user-details">
-            <strong>Admin</strong>
-            <span>Shop Staff</span>
-          </div>
-
-          <div class="user-avatar">
-            A
-          </div>
-
-        </div>
-
-      </header>
-
-      <div class="content-container">
-
-        <!-- Section title -->
-        <div class="section-heading">
-          <span>ORDER SUMMARY</span>
-        </div>
-
-        <section class="summary-grid">
-
-          <article class="summary-card">
-
-            <div class="card-top">
-              <span>Total Orders</span>
-
-              <div class="card-icon blue">
-                <img
-                  src="../assets/icontotalorder.png"
-                  alt=""
-                />
-              </div>
-            </div>
-
-            <div class="card-value">
-              156
-            </div>
-
-            <div class="card-description">
-              across all services
-            </div>
-
-          </article>
-
-          <article class="summary-card">
-
-            <div class="card-top">
-              <span>Total Revenue</span>
-
-              <div class="card-icon green">
-                <img
-                  src="../assets/icontotalrevenue.png"
-                  alt=""
-                />
-              </div>
-            </div>
-
-            <div class="card-value">
-              ₱48,520
-            </div>
-
-            <div class="card-description">
-              total collected
-            </div>
-
-          </article>
-
-          <article class="summary-card">
-
-            <div class="card-top">
-              <span>Claimed Orders</span>
-
-              <div class="card-icon claimed">
-                <img
-                  src="../assets/iconclaimedorders.png"
-                  alt=""
-                />
-              </div>
-            </div>
-
-            <div class="card-value">
-              89
-            </div>
-
-            <div class="card-description">
-              picked up by customers
-            </div>
-
-          </article>
-
-          <article class="summary-card">
-
-            <div class="card-top">
-              <span>Pending Orders</span>
-
-              <div class="card-icon pending">
-                <img
-                  src="../assets/iconpendingorders.png"
-                  alt=""
-                />
-              </div>
-            </div>
-
-            <div class="card-value">
-              67
-            </div>
-
-            <div class="card-description">
-              waiting for action
-            </div>
-
-          </article>
-
-        </section>
-
-        <section class="chart-card">
-
-          <div class="chart-header">
-
-            <div>
-              <h2>
-                Orders &amp; Revenue Over Time
-              </h2>
-
-              <p>
-                Last 7 days performance
-              </p>
-            </div>
-
-            <div class="chart-legend">
-
-              <div class="legend-item">
-                <span class="legend-line orders"></span>
-                <span>Orders</span>
-              </div>
-
-              <div class="legend-item">
-                <span class="legend-line revenue"></span>
-                <span>Revenue</span>
-              </div>
-
-            </div>
-
-          </div>
-
-          <div class="chart-container">
-            <canvas ref="chartCanvas"></canvas>
-          </div>
-
-        </section>
-
-        <section class="orders-card">
-
-          <div class="orders-header">
-
-            <div>
-              <h2>Recent Orders</h2>
-
-              <p>
-                Latest Laundry Orders
-              </p>
-            </div>
-
-            <button
-              type="button"
-              class="view-all"
-              @click="handleNavigation('Orders')"
+            <tr
+              v-for="order in recentOrders"
+              :key="order.number"
             >
-              View all orders
-            </button>
 
-          </div>
+              <td>
+                {{ order.number }}
+              </td>
 
-          <div class="table-wrapper">
+              <td>
+                {{ order.customer }}
+              </td>
 
-            <table>
+              <td>
+                {{ order.service }}
+              </td>
 
-              <thead>
-                <tr>
-                  <th>Order<br />Number</th>
-                  <th>Customer<br />Name</th>
-                  <th>Service</th>
-                  <th>Weight</th>
-                  <th>Total</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
+              <td>
+                {{ order.weight }}
+              </td>
 
-              <tbody>
+              <td class="total">
+                ₱{{ order.total }}
+              </td>
 
-                <tr
-                  v-for="order in recentOrders"
-                  :key="order.number"
+              <td>
+
+                <span
+                  class="status"
+                  :class="order.statusClass"
+                >
+                  <span class="status-dot"></span>
+
+                  {{ order.status }}
+                </span>
+
+              </td>
+
+              <td>
+
+                <button
+                  type="button"
+                  class="view-button"
+                  @click="viewOrder(order)"
                 >
 
-                  <td>
-                    {{ order.number }}
-                  </td>
+                  <img
+                    src="../assets/iconview.png"
+                    alt=""
+                  />
 
-                  <td>
-                    {{ order.customer }}
-                  </td>
+                  View
 
-                  <td>
-                    {{ order.service }}
-                  </td>
+                </button>
 
-                  <td>
-                    {{ order.weight }}
-                  </td>
+              </td>
 
-                  <td class="total">
-                    ₱{{ order.total }}
-                  </td>
+            </tr>
 
-                  <td>
+          </tbody>
 
-                    <span
-                      class="status"
-                      :class="order.statusClass"
-                    >
-                      <span class="status-dot"></span>
-
-                      {{ order.status }}
-                    </span>
-
-                  </td>
-
-                  <td>
-
-                    <button
-                      type="button"
-                      class="view-button"
-                      @click="viewOrder(order)"
-                    >
-
-                      <img
-                        src="../assets/iconview.png"
-                        alt=""
-                      />
-
-                      View
-
-                    </button>
-
-                  </td>
-
-                </tr>
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </section>
+        </table>
 
       </div>
 
-    </main>
+    </section>
+
+  </div>
+
+</main>
 
   </div>
 </template>
-
 
 <script setup>
 import {
@@ -353,7 +352,7 @@ import {
   onBeforeUnmount
 } from 'vue'
 
-const emit = defineEmits(['logout'])
+const emit = defineEmits(['logout', 'navigate'])
 
 import {
   Chart,
@@ -628,7 +627,7 @@ const createChart = () => {
 }
 
 const handleNavigation = (page) => {
-  console.log(`Navigate to: ${page}`)
+  emit('navigate', page)
 }
 
 const handleLogout = async () => {
@@ -670,7 +669,6 @@ onBeforeUnmount(() => {
 
 })
 </script>
-
 
 <style scoped>
 
@@ -1115,13 +1113,7 @@ td.total {
 }
 
 .view-button:hover {
-  background: #f8fafb;
+  background: #f7fafc;
+  border-color: #d7e0ea;
 }
-
-.view-button img {
-  width: 12px;
-  height: 12px;
-  object-fit: contain;
-}
-
 </style>
