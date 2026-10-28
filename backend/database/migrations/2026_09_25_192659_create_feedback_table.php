@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('feedback', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignId('order_id')
+                ->constrained('orders')
+                ->restrictOnDelete();
+
+            $table->unsignedTinyInteger('rating');
+
+            $table->string('type', 30);
+
+            $table->text('comment');
+
+            $table->timestamps();
+
+            $table->index('rating');
+            $table->index('type');
+            $table->index('created_at');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('feedback');
+    }
+};

@@ -97,30 +97,11 @@
     <main class="main-area">
 
       <!-- TOP HEADER -->
-      <header class="top-header">
-
-        <div class="date">
-          Sep 17, 2026 · Thursday
-        </div>
-
-        <div class="user-info">
-
-          <div class="user-details">
-            <strong>Admin</strong>
-            <span>Shop Staff</span>
-          </div>
-
-          <div class="user-avatar">
-            A
-          </div>
-
-        </div>
-
-      </header>
+     <TopHeader />
 
 
       <!-- =========================
-           SCROLLABLE CONTENT
+           CONTENT
       ========================== -->
       <div class="content-container">
 
@@ -248,10 +229,18 @@
                   :key="service.id"
                   :value="service.id"
                 >
-                  {{ service.service_name }} - ₱{{ formatPrice(service.price_per_kg) }}/kg
+                  {{ service.service_name }}
+                  - ₱{{ formatPrice(service.price_per_kg) }}/kg
                 </option>
 
               </select>
+
+              <span
+                v-if="services.length === 0"
+                class="helper-message"
+              >
+                No active services are currently available.
+              </span>
 
               <span
                 v-if="errors.service"
@@ -281,7 +270,9 @@
                   :class="{ error: errors.weight }"
                 />
 
-                <span>kg</span>
+                <span>
+                  kg
+                </span>
 
               </div>
 
@@ -316,13 +307,20 @@
 
 
           <!-- FABRIC CONDITIONER -->
-          <div class="addon-row">
+          <div
+            class="addon-row"
+            :class="{
+              'addon-disabled':
+                !addons.fabricConditioner.active
+            }"
+          >
 
             <label class="addon-left">
 
               <input
                 v-model="addons.fabricConditioner.selected"
                 type="checkbox"
+                :disabled="!addons.fabricConditioner.active"
               />
 
               <span class="custom-checkbox"></span>
@@ -331,6 +329,13 @@
 
                 <strong>
                   Fabric Conditioner
+
+                  <small
+                    v-if="!addons.fabricConditioner.active"
+                    class="inactive-label"
+                  >
+                    Inactive
+                  </small>
                 </strong>
 
                 <small>
@@ -349,7 +354,10 @@
                 <button
                   type="button"
                   @click="decreaseAddon('fabricConditioner')"
-                  :disabled="!addons.fabricConditioner.selected"
+                  :disabled="
+                    !addons.fabricConditioner.active ||
+                    !addons.fabricConditioner.selected
+                  "
                 >
                   −
                 </button>
@@ -361,7 +369,10 @@
                 <button
                   type="button"
                   @click="increaseAddon('fabricConditioner')"
-                  :disabled="!addons.fabricConditioner.selected"
+                  :disabled="
+                    !addons.fabricConditioner.active ||
+                    !addons.fabricConditioner.selected
+                  "
                 >
                   +
                 </button>
@@ -378,13 +389,20 @@
 
 
           <!-- EXTRA DRYING -->
-          <div class="addon-row">
+          <div
+            class="addon-row"
+            :class="{
+              'addon-disabled':
+                !addons.extraDrying.active
+            }"
+          >
 
             <label class="addon-left">
 
               <input
                 v-model="addons.extraDrying.selected"
                 type="checkbox"
+                :disabled="!addons.extraDrying.active"
               />
 
               <span class="custom-checkbox"></span>
@@ -393,6 +411,13 @@
 
                 <strong>
                   Extra Drying
+
+                  <small
+                    v-if="!addons.extraDrying.active"
+                    class="inactive-label"
+                  >
+                    Inactive
+                  </small>
                 </strong>
 
                 <small>
@@ -411,7 +436,10 @@
                 <button
                   type="button"
                   @click="decreaseAddon('extraDrying')"
-                  :disabled="!addons.extraDrying.selected"
+                  :disabled="
+                    !addons.extraDrying.active ||
+                    !addons.extraDrying.selected
+                  "
                 >
                   −
                 </button>
@@ -423,7 +451,10 @@
                 <button
                   type="button"
                   @click="increaseAddon('extraDrying')"
-                  :disabled="!addons.extraDrying.selected"
+                  :disabled="
+                    !addons.extraDrying.active ||
+                    !addons.extraDrying.selected
+                  "
                 >
                   +
                 </button>
@@ -448,7 +479,9 @@
 
           <div class="section-title">
 
-            <h2>Estimated Pickup</h2>
+            <h2>
+              Estimated Pickup
+            </h2>
 
             <p>
               Choose the expected pickup date and time.
@@ -468,6 +501,7 @@
               <input
                 v-model="form.pickupDate"
                 type="date"
+                :min="todayDate"
                 :class="{ error: errors.pickupDate }"
               />
 
@@ -543,13 +577,17 @@
 
 
             <div
-              v-if="addons.fabricConditioner.selected &&
-                     addons.fabricConditioner.quantity > 0"
+              v-if="
+                addons.fabricConditioner.active &&
+                addons.fabricConditioner.selected &&
+                addons.fabricConditioner.quantity > 0
+              "
               class="price-line"
             >
 
               <span>
-                Fabric Conditioner x{{ addons.fabricConditioner.quantity }}
+                Fabric Conditioner
+                x{{ addons.fabricConditioner.quantity }}
               </span>
 
               <strong>
@@ -560,13 +598,17 @@
 
 
             <div
-              v-if="addons.extraDrying.selected &&
-                     addons.extraDrying.quantity > 0"
+              v-if="
+                addons.extraDrying.active &&
+                addons.extraDrying.selected &&
+                addons.extraDrying.quantity > 0
+              "
               class="price-line"
             >
 
               <span>
-                Extra Drying x{{ addons.extraDrying.quantity }}
+                Extra Drying
+                x{{ addons.extraDrying.quantity }}
               </span>
 
               <strong>
@@ -610,19 +652,27 @@
             type="button"
             class="create-button"
             @click="createOrder"
-            :disabled="creatingOrder"
+            :disabled="
+              creatingOrder ||
+              services.length === 0
+            "
           >
-            {{ creatingOrder ? 'Creating Order...' : 'Create Order' }}
+            {{
+              creatingOrder
+                ? 'Creating Order...'
+                : 'Create Order'
+            }}
           </button>
 
         </div>
 
-        <span
+
+        <div
           v-if="apiError"
-          class="error-message"
+          class="api-error"
         >
           {{ apiError }}
-        </span>
+        </div>
 
       </div>
 
@@ -642,7 +692,7 @@
         <button
           type="button"
           class="close-modal"
-          @click="showReceipt = false"
+          @click="exitReceipt"
           aria-label="Close receipt"
         >
           ×
@@ -652,12 +702,23 @@
         <div class="receipt-header">
 
           <div class="receipt-title">
-            <span class="receipt-success-icon">✓</span>
+
+            <span class="receipt-success-icon">
+              ✓
+            </span>
 
             <div>
-              <h2>Order Receipt</h2>
-              <p>Ticket: {{ createdOrder.order_number }}</p>
+
+              <h2>
+                Order Receipt
+              </h2>
+
+              <p>
+                Ticket: {{ createdOrder?.order_number }}
+              </p>
+
             </div>
+
           </div>
 
         </div>
@@ -669,23 +730,43 @@
         <div class="receipt-details">
 
           <div>
-            <span>Customer Name</span>
-            <strong>{{ createdOrder.customer_name }}</strong>
+            <span>
+              Customer Name
+            </span>
+
+            <strong>
+              {{ createdOrder?.customer_name }}
+            </strong>
           </div>
 
           <div>
-            <span>Phone Number</span>
-            <strong>{{ createdOrder.phone_number }}</strong>
+            <span>
+              Phone Number
+            </span>
+
+            <strong>
+              {{ createdOrder?.phone_number }}
+            </strong>
           </div>
 
           <div>
-            <span>Main Service</span>
-            <strong>{{ createdOrder.service.service_name }}</strong>
+            <span>
+              Main Service
+            </span>
+
+            <strong>
+              {{ createdOrder?.service?.service_name }}
+            </strong>
           </div>
 
           <div>
-            <span>Load Weight</span>
-            <strong>{{ createdOrder.weight }} kg</strong>
+            <span>
+              Load Weight
+            </span>
+
+            <strong>
+              {{ createdOrder?.weight }} kg
+            </strong>
           </div>
 
         </div>
@@ -695,25 +776,45 @@
 
 
         <section class="receipt-section">
-          <h3>ADD-ONS SELECTED</h3>
+
+          <h3>
+            ADD-ONS SELECTED
+          </h3>
+
 
           <div
-            v-for="addon in createdOrder.addons"
+            v-for="addon in createdOrder?.addons || []"
             :key="addon.id"
             class="receipt-addon-row"
           >
+
             <span>
+
               {{ addon.addon_name }}
-              <small>x{{ addon.quantity }}</small>
+
+              <small>
+                x{{ addon.quantity }}
+              </small>
+
             </span>
 
             <strong>
-              ₱{{ formatPrice(addon.addon_price * addon.quantity) }}
+              ₱{{
+                formatPrice(
+                  Number(addon.addon_price) *
+                  Number(addon.quantity)
+                )
+              }}
             </strong>
+
           </div>
 
+
           <p
-            v-if="createdOrder.addons.length === 0"
+            v-if="
+              !createdOrder?.addons ||
+              createdOrder.addons.length === 0
+            "
             class="receipt-empty-addons"
           >
             No add-ons selected.
@@ -726,36 +827,57 @@
 
 
         <section class="receipt-section receipt-cost-breakdown">
-          <h3>COST BREAKDOWN</h3>
+
+          <h3>
+            COST BREAKDOWN
+          </h3>
+
 
           <div class="receipt-cost-row">
+
             <span>
-              Base Service ({{ createdOrder.service.service_name }} {{ createdOrder.weight }}kg)
+              Base Service
+              ({{ createdOrder?.service?.service_name }}
+              {{ createdOrder?.weight }}kg)
             </span>
 
             <strong>
               ₱{{ formatPrice(receiptServiceCost) }}
             </strong>
+
           </div>
 
+
           <div
-            v-for="addon in createdOrder.addons"
+            v-for="addon in createdOrder?.addons || []"
             :key="`cost-${addon.id}`"
             class="receipt-cost-row"
           >
-            <span>{{ addon.addon_name }}</span>
+
+            <span>
+              {{ addon.addon_name }}
+            </span>
 
             <strong>
-              ₱{{ formatPrice(addon.addon_price * addon.quantity) }}
+              ₱{{
+                formatPrice(
+                  Number(addon.addon_price) *
+                  Number(addon.quantity)
+                )
+              }}
             </strong>
+
           </div>
+
 
           <div class="receipt-total">
 
-            <span>Total Amount</span>
+            <span>
+              Total Amount
+            </span>
 
             <strong>
-              ₱{{ formatPrice(createdOrder.total_price) }}
+              ₱{{ formatPrice(createdOrder?.total_price) }}
             </strong>
 
           </div>
@@ -769,16 +891,32 @@
         <div class="receipt-footer-details">
 
           <div>
-            <span>Order Status</span>
+
+            <span>
+              Order Status
+            </span>
+
             <strong class="receipt-status">
+
               <span class="receipt-status-dot"></span>
-              {{ createdOrder.status }}
+
+              {{ createdOrder?.status }}
+
             </strong>
+
           </div>
 
+
           <div>
-            <span>Estimated Pickup</span>
-            <strong>{{ formatPickup(createdOrder.estimated_pickup) }}</strong>
+
+            <span>
+              Estimated Pickup
+            </span>
+
+            <strong>
+              {{ formatPickup(createdOrder?.estimated_pickup) }}
+            </strong>
+
           </div>
 
         </div>
@@ -789,7 +927,7 @@
           <button
             type="button"
             class="receipt-print"
-            @click="$event.currentTarget.ownerDocument.defaultView.print()"
+            @click="printReceipt"
           >
             ▣
             Print Receipt
@@ -797,8 +935,9 @@
 
         </div>
 
+
         <p class="receipt-note">
-          Closing this window will not cancel the order.
+          Order created successfully. Use X to return to the Orders list.
         </p>
 
       </div>
@@ -810,24 +949,68 @@
 
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import {
+  computed,
+  onMounted,
+  reactive,
+  ref
+} from 'vue'
+
+import TopHeader from './TopHeader.vue'
 
 const emit = defineEmits([
   'navigate',
-  'logout'
+  'logout',
+  'order-created'
 ])
 
 
 /* =========================
-   ORDER NUMBER
+   DATE
+========================= */
+
+const getLocalDate = () => {
+  const now = new Date()
+
+  const year = now.getFullYear()
+
+  const month = String(
+    now.getMonth() + 1
+  ).padStart(2, '0')
+
+  const day = String(
+    now.getDate()
+  ).padStart(2, '0')
+
+  return `${year}-${month}-${day}`
+}
+
+const todayDate = getLocalDate()
+
+const currentDate = computed(() => {
+  return new Date().toLocaleDateString(
+    'en-PH',
+    {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      weekday: 'long'
+    }
+  )
+})
+
+
+/* =========================
+   DATA
 ========================= */
 
 const services = ref([])
-const createdOrder = ref(null)
-const creatingOrder = ref(false)
-const apiError = ref('')
 
-const orderNumber = computed(() => createdOrder.value?.order_number || '—')
+const createdOrder = ref(null)
+
+const creatingOrder = ref(false)
+
+const apiError = ref('')
 
 
 /* =========================
@@ -835,12 +1018,19 @@ const orderNumber = computed(() => createdOrder.value?.order_number || '—')
 ========================= */
 
 const form = reactive({
+
   customerName: '',
+
   phone: '',
+
   serviceId: '',
+
   weight: 5,
-  pickupDate: '2026-05-18',
+
+  pickupDate: todayDate,
+
   pickupTime: '10:00'
+
 })
 
 
@@ -851,17 +1041,31 @@ const form = reactive({
 const addons = reactive({
 
   fabricConditioner: {
+
     id: null,
-    selected: true,
-    quantity: 1,
+
+    active: false,
+
+    selected: false,
+
+    quantity: 0,
+
     price: 0
+
   },
 
   extraDrying: {
+
     id: null,
-    selected: true,
-    quantity: 1,
+
+    active: false,
+
+    selected: false,
+
+    quantity: 0,
+
     price: 0
+
   }
 
 })
@@ -874,10 +1078,15 @@ const addons = reactive({
 const errors = reactive({
 
   customerName: '',
+
   phone: '',
+
   service: '',
+
   weight: '',
+
   pickupDate: '',
+
   pickupTime: ''
 
 })
@@ -889,8 +1098,28 @@ const errors = reactive({
 
 const showReceipt = ref(false)
 
+const orderNumber = computed(() => {
+
+  return (
+    createdOrder.value?.order_number ||
+    '—'
+  )
+
+})
+
+
+/* =========================
+   SELECTED SERVICE
+========================= */
+
 const selectedService = computed(() => {
-  return services.value.find((service) => service.id === Number(form.serviceId))
+
+  return services.value.find(
+    (service) =>
+      Number(service.id) ===
+      Number(form.serviceId)
+  ) || null
+
 })
 
 
@@ -899,7 +1128,12 @@ const selectedService = computed(() => {
 ========================= */
 
 const servicePrice = computed(() => {
-  return Number(selectedService.value?.price_per_kg || 0)
+
+  return Number(
+    selectedService.value?.price_per_kg ||
+    0
+  )
+
 })
 
 
@@ -909,9 +1143,14 @@ const servicePrice = computed(() => {
 
 const baseServiceCost = computed(() => {
 
-  const weight = Number(form.weight) || 0
+  const weight =
+    Number(form.weight) || 0
 
-  return servicePrice.value * weight
+  return (
+    servicePrice.value *
+    weight
+  )
+
 })
 
 
@@ -919,30 +1158,40 @@ const baseServiceCost = computed(() => {
    ADD-ON COSTS
 ========================= */
 
-const fabricConditionerCost = computed(() => {
+const fabricConditionerCost =
+  computed(() => {
 
-  if (!addons.fabricConditioner.selected) {
-    return 0
-  }
+    if (
+      !addons.fabricConditioner.active ||
+      !addons.fabricConditioner.selected
+    ) {
+      return 0
+    }
 
-  return (
-    addons.fabricConditioner.quantity *
-    addons.fabricConditioner.price
-  )
-})
+    return (
+      addons.fabricConditioner.quantity *
+      addons.fabricConditioner.price
+    )
+
+  })
 
 
-const extraDryingCost = computed(() => {
+const extraDryingCost =
+  computed(() => {
 
-  if (!addons.extraDrying.selected) {
-    return 0
-  }
+    if (
+      !addons.extraDrying.active ||
+      !addons.extraDrying.selected
+    ) {
+      return 0
+    }
 
-  return (
-    addons.extraDrying.quantity *
-    addons.extraDrying.price
-  )
-})
+    return (
+      addons.extraDrying.quantity *
+      addons.extraDrying.price
+    )
+
+  })
 
 
 /* =========================
@@ -961,21 +1210,66 @@ const totalPrice = computed(() => {
 
 
 /* =========================
-   PICKUP DISPLAY
+   RECEIPT SERVICE COST
 ========================= */
 
-const formattedPickup = computed(() => {
+const receiptServiceCost =
+  computed(() => {
 
-  if (!form.pickupDate || !form.pickupTime) {
+    if (!createdOrder.value) {
+      return 0
+    }
+
+    const servicePrice =
+      Number(
+        createdOrder.value
+          ?.service
+          ?.price_per_kg || 0
+      )
+
+    const weight =
+      Number(
+        createdOrder.value
+          ?.weight || 0
+      )
+
+    return servicePrice * weight
+
+  })
+
+
+/* =========================
+   FORMAT PRICE
+========================= */
+
+const formatPrice = (value) => {
+
+  return Number(
+    value || 0
+  ).toFixed(2)
+
+}
+
+
+/* =========================
+   FORMAT PICKUP
+========================= */
+
+const formatPickup = (value) => {
+
+  if (!value) {
     return 'Not set'
   }
 
-  const date = new Date(
-    `${form.pickupDate}T${form.pickupTime}`
-  )
+  const date =
+    new Date(value)
 
-  if (Number.isNaN(date.getTime())) {
-    return `${form.pickupDate} ${form.pickupTime}`
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return value
   }
 
   return date.toLocaleString(
@@ -989,41 +1283,274 @@ const formattedPickup = computed(() => {
     }
   )
 
-})
-
-const receiptServiceCost = computed(() => {
-  if (!createdOrder.value) {
-    return 0
-  }
-
-  return createdOrder.value.service.price_per_kg * createdOrder.value.weight
-})
+}
 
 
 /* =========================
-   FORMAT PRICE
+   AUTH HEADERS
 ========================= */
 
-const formatPrice = (value) => {
+const authHeaders = () => {
 
-  return Number(value || 0).toFixed(2)
+  const token =
+    localStorage.getItem(
+      'washup_token'
+    )
+
+  return {
+
+    Accept:
+      'application/json',
+
+    Authorization:
+      `Bearer ${token}`
+
+  }
 
 }
 
-const formatPickup = (value) => {
-  const date = new Date(value)
 
-  if (Number.isNaN(date.getTime())) {
-    return value
-  }
+/* =========================
+   LOAD ORDER OPTIONS
+========================= */
 
-  return date.toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit'
-  })
+const loadOrderOptions =
+  async () => {
+
+    try {
+
+      apiError.value = ''
+
+      const [
+        servicesResponse,
+        addonsResponse
+      ] = await Promise.all([
+
+        fetch(
+          '/api/services',
+          {
+            method: 'GET',
+            headers:
+              authHeaders()
+          }
+        ),
+
+        fetch(
+          '/api/addons',
+          {
+            method: 'GET',
+            headers:
+              authHeaders()
+          }
+        )
+
+      ])
+
+
+      /* =========================
+         AUTH ERROR
+      ========================== */
+
+      if (
+        servicesResponse.status === 401 ||
+        addonsResponse.status === 401
+      ) {
+
+        apiError.value =
+          'Your session has expired. Please log in again.'
+
+        return
+
+      }
+
+
+      /* =========================
+         SERVER ERROR
+      ========================== */
+
+      if (
+        !servicesResponse.ok ||
+        !addonsResponse.ok
+      ) {
+
+        throw new Error(
+          'Could not load order options.'
+        )
+
+      }
+
+
+      const allServices =
+        await servicesResponse.json()
+
+      const allAddons =
+        await addonsResponse.json()
+
+
+      /* =========================
+         ONLY ACTIVE SERVICES
+      ========================== */
+
+      services.value =
+        Array.isArray(allServices)
+          ? allServices.filter(
+              (service) =>
+                service.is_active === true ||
+                service.is_active === 1
+            )
+          : []
+
+
+      /* =========================
+         DEFAULT SERVICE
+      ========================== */
+
+      const washAndDry =
+        services.value.find(
+          (service) =>
+            service.service_name ===
+            'Wash & Dry'
+        )
+
+      form.serviceId =
+        washAndDry?.id ||
+        services.value[0]?.id ||
+        ''
+
+
+      /* =========================
+         FIND ADD-ONS
+      ========================== */
+
+      const fabricConditioner =
+        Array.isArray(allAddons)
+          ? allAddons.find(
+              (addon) =>
+                addon.addon_name ===
+                'Fabric Conditioner'
+            )
+          : null
+
+
+      const extraDrying =
+        Array.isArray(allAddons)
+          ? allAddons.find(
+              (addon) =>
+                addon.addon_name ===
+                'Extra Drying'
+            )
+          : null
+
+
+      /* =========================
+         FABRIC CONDITIONER
+      ========================== */
+
+      if (
+        fabricConditioner &&
+        (
+          fabricConditioner.is_active === true ||
+          fabricConditioner.is_active === 1
+        )
+      ) {
+
+        addons.fabricConditioner.id =
+          fabricConditioner.id
+
+        addons.fabricConditioner.price =
+          Number(
+            fabricConditioner.addon_price
+          )
+
+        addons.fabricConditioner.active =
+          true
+
+        addons.fabricConditioner.selected =
+          true
+
+        addons.fabricConditioner.quantity =
+          1
+
+      } else {
+
+        addons.fabricConditioner.id =
+          null
+
+        addons.fabricConditioner.price =
+          0
+
+        addons.fabricConditioner.active =
+          false
+
+        addons.fabricConditioner.selected =
+          false
+
+        addons.fabricConditioner.quantity =
+          0
+
+      }
+
+
+      /* =========================
+         EXTRA DRYING
+      ========================== */
+
+      if (
+        extraDrying &&
+        (
+          extraDrying.is_active === true ||
+          extraDrying.is_active === 1
+        )
+      ) {
+
+        addons.extraDrying.id =
+          extraDrying.id
+
+        addons.extraDrying.price =
+          Number(
+            extraDrying.addon_price
+          )
+
+        addons.extraDrying.active =
+          true
+
+        addons.extraDrying.selected =
+          true
+
+        addons.extraDrying.quantity =
+          1
+
+      } else {
+
+        addons.extraDrying.id =
+          null
+
+        addons.extraDrying.price =
+          0
+
+        addons.extraDrying.active =
+          false
+
+        addons.extraDrying.selected =
+          false
+
+        addons.extraDrying.quantity =
+          0
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        'Order options error:',
+        error
+      )
+
+      apiError.value =
+        'Unable to load services and add-ons. Please try again.'
+
+    }
+
 }
 
 
@@ -1031,29 +1558,48 @@ const formatPickup = (value) => {
    ADD-ON QUANTITY
 ========================= */
 
-const increaseAddon = (addonName) => {
+const increaseAddon =
+  (addonName) => {
 
-  addons[addonName].selected = true
+    const addon =
+      addons[addonName]
 
-  addons[addonName].quantity += 1
+    if (!addon.active) {
+      return
+    }
 
-}
+    addon.selected = true
 
-
-const decreaseAddon = (addonName) => {
-
-  if (addons[addonName].quantity > 1) {
-
-    addons[addonName].quantity -= 1
-
-  } else {
-
-    addons[addonName].quantity = 0
-    addons[addonName].selected = false
+    addon.quantity += 1
 
   }
 
-}
+
+const decreaseAddon =
+  (addonName) => {
+
+    const addon =
+      addons[addonName]
+
+    if (!addon.active) {
+      return
+    }
+
+    if (
+      addon.quantity > 1
+    ) {
+
+      addon.quantity -= 1
+
+    } else {
+
+      addon.quantity = 0
+
+      addon.selected = false
+
+    }
+
+  }
 
 
 /* =========================
@@ -1063,16 +1609,23 @@ const decreaseAddon = (addonName) => {
 const validateForm = () => {
 
   errors.customerName = ''
+
   errors.phone = ''
+
   errors.service = ''
+
   errors.weight = ''
+
   errors.pickupDate = ''
+
   errors.pickupTime = ''
 
   let valid = true
 
 
-  if (!form.customerName.trim()) {
+  if (
+    !form.customerName.trim()
+  ) {
 
     errors.customerName =
       'Customer name is required.'
@@ -1082,7 +1635,9 @@ const validateForm = () => {
   }
 
 
-  if (!form.phone.trim()) {
+  if (
+    !form.phone.trim()
+  ) {
 
     errors.phone =
       'Phone number is required.'
@@ -1102,7 +1657,10 @@ const validateForm = () => {
   }
 
 
-  if (!form.weight || Number(form.weight) <= 0) {
+  if (
+    !form.weight ||
+    Number(form.weight) <= 0
+  ) {
 
     errors.weight =
       'Weight must be greater than 0.'
@@ -1132,140 +1690,318 @@ const validateForm = () => {
   }
 
 
+  /*
+   * Make sure the selected service
+   * is still active.
+   */
+  const serviceStillActive =
+    services.value.some(
+      (service) =>
+        Number(service.id) ===
+        Number(form.serviceId)
+    )
+
+  if (
+    form.serviceId &&
+    !serviceStillActive
+  ) {
+
+    errors.service =
+      'The selected service is no longer active.'
+
+    valid = false
+
+  }
+
+
   return valid
 
 }
 
 
 /* =========================
+   SERVER VALIDATION ERRORS
+========================= */
+
+const showServerErrors =
+  (serverErrors) => {
+
+    const fieldMap = {
+
+      customer_name:
+        'customerName',
+
+      phone_number:
+        'phone',
+
+      service_id:
+        'service',
+
+      weight:
+        'weight',
+
+      estimated_pickup:
+        'pickupDate'
+
+    }
+
+
+    Object.entries(
+      serverErrors || {}
+    ).forEach(
+      ([field, messages]) => {
+
+        const formField =
+          fieldMap[field]
+
+        if (formField) {
+
+          errors[formField] =
+            Array.isArray(messages)
+              ? messages[0]
+              : messages
+
+        }
+
+      }
+    )
+
+  }
+
+
+/* =========================
    CREATE ORDER
 ========================= */
 
-const authHeaders = () => {
-  const token = localStorage.getItem('washup_token')
+const createOrder =
+  async () => {
 
-  return {
-    Accept: 'application/json',
-    Authorization: `Bearer ${token}`
-  }
-}
-
-const loadOrderOptions = async () => {
-  try {
-    const [servicesResponse, addonsResponse] = await Promise.all([
-      fetch('/api/services', { headers: authHeaders() }),
-      fetch('/api/addons', { headers: authHeaders() })
-    ])
-
-    if (servicesResponse.status === 401 || addonsResponse.status === 401) {
-      apiError.value = 'Your session has expired. Please log in again.'
+    if (
+      creatingOrder.value ||
+      !validateForm()
+    ) {
       return
     }
 
-    if (!servicesResponse.ok || !addonsResponse.ok) {
-      throw new Error('Could not load order options.')
+
+    apiError.value = ''
+
+    creatingOrder.value =
+      true
+
+
+    /*
+     * Only active and selected
+     * add-ons are sent to Laravel.
+     */
+    const selectedAddons =
+      Object.values(addons)
+
+        .filter(
+          (addon) =>
+            addon.active &&
+            addon.selected &&
+            addon.quantity > 0 &&
+            addon.id
+        )
+
+        .map(
+          (addon) => ({
+            addon_id:
+              addon.id,
+
+            quantity:
+              addon.quantity
+          })
+        )
+
+
+    try {
+
+      const response =
+        await fetch(
+          '/api/orders',
+          {
+
+            method: 'POST',
+
+            headers: {
+
+              ...authHeaders(),
+
+              'Content-Type':
+                'application/json'
+
+            },
+
+            body:
+              JSON.stringify({
+
+                customer_name:
+                  form.customerName,
+
+                phone_number:
+                  form.phone,
+
+                service_id:
+                  form.serviceId,
+
+                weight:
+                  form.weight,
+
+                estimated_pickup:
+                  `${form.pickupDate}T${form.pickupTime}`,
+
+                addons:
+                  selectedAddons
+
+              })
+
+          }
+        )
+
+
+      let data = null
+
+      try {
+
+        data =
+          await response.json()
+
+      } catch {
+
+        data = {}
+
+      }
+
+
+      /* =========================
+         SESSION EXPIRED
+      ========================== */
+
+      if (
+        response.status === 401
+      ) {
+
+        apiError.value =
+          'Your session has expired. Please log in again.'
+
+        return
+
+      }
+
+
+      /* =========================
+         VALIDATION / BUSINESS RULE
+      ========================== */
+
+      if (
+        response.status === 422
+      ) {
+
+        showServerErrors(
+          data?.errors
+        )
+
+        apiError.value =
+          data?.message ||
+          'Please correct the highlighted fields and try again.'
+
+        return
+
+      }
+
+
+      /* =========================
+         OTHER SERVER ERROR
+      ========================== */
+
+      if (!response.ok) {
+
+        console.error(
+          'Create order failed:',
+          response.status,
+          data
+        )
+
+        apiError.value =
+          data?.message ||
+          `Unable to create the order. Server returned ${response.status}.`
+
+        return
+
+      }
+
+
+      /* =========================
+         SUCCESS
+      ========================== */
+
+      createdOrder.value =
+        data
+
+
+      /*
+       * Tell App.vue that a new
+       * order was created.
+       */
+      emit(
+        'order-created',
+        data
+      )
+
+
+      /*
+       * Show receipt.
+       */
+      showReceipt.value =
+        true
+
+
+    } catch (error) {
+
+      console.error(
+        'Create order network error:',
+        error
+      )
+
+      apiError.value =
+        'Unable to connect to the server. Please make sure the Laravel server is running.'
+
+    } finally {
+
+      creatingOrder.value =
+        false
+
     }
 
-    services.value = await servicesResponse.json()
-    const addonOptions = await addonsResponse.json()
-
-    const washAndDry = services.value.find((service) => service.service_name === 'Wash & Dry')
-    form.serviceId = washAndDry?.id || services.value[0]?.id || ''
-
-    const fabricConditioner = addonOptions.find((addon) => addon.addon_name === 'Fabric Conditioner')
-    const extraDrying = addonOptions.find((addon) => addon.addon_name === 'Extra Drying')
-
-    if (fabricConditioner) {
-      addons.fabricConditioner.id = fabricConditioner.id
-      addons.fabricConditioner.price = Number(fabricConditioner.addon_price)
-    }
-
-    if (extraDrying) {
-      addons.extraDrying.id = extraDrying.id
-      addons.extraDrying.price = Number(extraDrying.addon_price)
-    }
-  } catch (error) {
-    console.error('Order options error:', error)
-    apiError.value = 'Unable to load services and add-ons. Please try again.'
-  }
 }
 
-const showServerErrors = (serverErrors) => {
-  const fieldMap = {
-    customer_name: 'customerName',
-    phone_number: 'phone',
-    service_id: 'service',
-    weight: 'weight',
-    estimated_pickup: 'pickupDate'
-  }
 
-  Object.entries(serverErrors || {}).forEach(([field, messages]) => {
-    const formField = fieldMap[field]
+/* =========================
+   RECEIPT EXIT
+========================= */
 
-    if (formField) {
-      errors[formField] = messages[0]
-    }
-  })
+const exitReceipt = () => {
+
+  showReceipt.value =
+    false
+
+  emit(
+    'navigate',
+    'Orders'
+  )
+
 }
 
-const createOrder = async () => {
 
-  if (creatingOrder.value || !validateForm()) {
-    return
-  }
+/* =========================
+   PRINT RECEIPT
+========================= */
 
-  apiError.value = ''
-  creatingOrder.value = true
+const printReceipt = () => {
 
-  const selectedAddons = Object.values(addons)
-    .filter((addon) => addon.selected && addon.quantity > 0 && addon.id)
-    .map((addon) => ({
-      addon_id: addon.id,
-      quantity: addon.quantity
-    }))
-
-  try {
-    const response = await fetch('/api/orders', {
-      method: 'POST',
-      headers: {
-        ...authHeaders(),
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        customer_name: form.customerName,
-        phone_number: form.phone,
-        service_id: form.serviceId,
-        weight: form.weight,
-        estimated_pickup: `${form.pickupDate}T${form.pickupTime}`,
-        addons: selectedAddons
-      })
-    })
-
-    const data = await response.json()
-
-    if (response.status === 401) {
-      apiError.value = 'Your session has expired. Please log in again.'
-      return
-    }
-
-    if (response.status === 422) {
-      showServerErrors(data.errors)
-      apiError.value = 'Please correct the highlighted fields and try again.'
-      return
-    }
-
-    if (!response.ok) {
-      throw new Error('Could not create the order.')
-    }
-
-    createdOrder.value = data
-    showReceipt.value = true
-  } catch (error) {
-    console.error('Create order error:', error)
-    apiError.value = 'Unable to create the order. Please check your connection and try again.'
-  } finally {
-    creatingOrder.value = false
-  }
+  window.print()
 
 }
 
@@ -1276,63 +2012,88 @@ const createOrder = async () => {
 
 const goTo = (page) => {
 
-  emit('navigate', page)
+  emit(
+    'navigate',
+    page
+  )
 
 }
-
-onMounted(() => {
-  loadOrderOptions()
-})
 
 
 /* =========================
    LOGOUT
 ========================= */
 
-const handleLogout = async () => {
+const handleLogout =
+  async () => {
 
-  const token =
-    localStorage.getItem('washup_token')
+    const token =
+      localStorage.getItem(
+        'washup_token'
+      )
 
-  try {
 
-    if (token) {
+    try {
 
-      await fetch('/api/logout', {
-        method: 'POST',
+      if (token) {
 
-        headers: {
-          Accept: 'application/json',
+        await fetch(
+          '/api/logout',
+          {
 
-          Authorization:
-            `Bearer ${token}`
-        }
-      })
+            method: 'POST',
+
+            headers: {
+
+              Accept:
+                'application/json',
+
+              Authorization:
+                `Bearer ${token}`
+
+            }
+
+          }
+        )
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        'Logout error:',
+        error
+      )
+
+    } finally {
+
+      localStorage.removeItem(
+        'washup_token'
+      )
+
+      localStorage.removeItem(
+        'washup_user'
+      )
+
+      emit(
+        'logout'
+      )
 
     }
 
-  } catch (error) {
-
-    console.error(
-      'Logout error:',
-      error
-    )
-
-  } finally {
-
-    localStorage.removeItem(
-      'washup_token'
-    )
-
-    localStorage.removeItem(
-      'washup_user'
-    )
-
-    emit('logout')
-
   }
 
-}
+
+/* =========================
+   INITIAL LOAD
+========================= */
+
+onMounted(() => {
+
+  loadOrderOptions()
+
+})
+
 </script>
 
 
@@ -1824,6 +2585,17 @@ const handleLogout = async () => {
 }
 
 
+.helper-message {
+  display: block;
+
+  margin-top: 5px;
+
+  font-size: 8px;
+
+  color: #8b99aa;
+}
+
+
 .input-with-unit {
   position: relative;
 }
@@ -1866,6 +2638,10 @@ const handleLogout = async () => {
   background: #f8fafc;
 
   border-radius: 7px;
+
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease;
 }
 
 
@@ -1874,11 +2650,23 @@ const handleLogout = async () => {
 }
 
 
+.addon-disabled {
+  opacity: 0.55;
+
+  background: #f2f4f7;
+}
+
+
 .addon-left {
   display: flex;
   align-items: center;
 
   cursor: pointer;
+}
+
+
+.addon-left:has(input:disabled) {
+  cursor: not-allowed;
 }
 
 
@@ -1948,6 +2736,26 @@ const handleLogout = async () => {
   font-size: 7px;
 
   color: #8a99ac;
+}
+
+
+.addon-info .inactive-label {
+  display: inline-block;
+
+  margin-top: 0;
+  margin-left: 6px;
+
+  padding: 2px 5px;
+
+  border-radius: 8px;
+
+  background: #e8edf2;
+
+  color: #7c8795;
+
+  font-size: 7px;
+
+  font-weight: 600;
 }
 
 
@@ -2147,8 +2955,33 @@ const handleLogout = async () => {
 }
 
 
-.create-button:hover {
+.create-button:hover:not(:disabled) {
   background: #19768f;
+}
+
+
+.create-button:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+
+.api-error {
+  margin-top: -5px;
+  margin-bottom: 15px;
+
+  padding: 10px 12px;
+
+  border: 1px solid #f1c7c7;
+
+  border-radius: 6px;
+
+  background: #fff5f5;
+
+  color: #b44a4a;
+
+  font-size: 9px;
 }
 
 
@@ -2164,6 +2997,7 @@ const handleLogout = async () => {
   z-index: 100;
 
   display: flex;
+
   align-items: center;
   justify-content: center;
 
@@ -2178,81 +3012,108 @@ const handleLogout = async () => {
 
   width: 100%;
 
-  max-width: 420px;
+  max-width: 480px;
 
   max-height: 90vh;
 
   overflow-y: auto;
 
-  padding: 25px;
+  padding: 31px 32px 12px;
 
   background: #ffffff;
 
-  border-radius: 12px;
+  border-radius: 15px;
 
   box-shadow:
-    0 20px 50px rgba(16, 24, 40, 0.2);
+    0 18px 45px rgba(16, 24, 40, 0.2);
 }
 
 
 .close-modal {
   position: absolute;
 
-  top: 12px;
-  right: 15px;
+  top: 31px;
+  right: 31px;
 
-  width: 28px;
-  height: 28px;
+  width: 29px;
+  height: 29px;
 
   border: none;
 
-  background: transparent;
+  border-radius: 50%;
+
+  background: #f7f9fc;
 
   color: #7f91a8;
 
-  font-size: 20px;
+  font-size: 15px;
+
+  line-height: 1;
 
   cursor: pointer;
 }
 
 
-.receipt-header {
-  text-align: center;
+.close-modal:hover {
+  background: #edf1f5;
+
+  color: #172033;
 }
 
 
-.receipt-logo {
+.receipt-header {
+  text-align: left;
+}
+
+
+.receipt-title {
+  display: flex;
+
+  align-items: center;
+
+  gap: 11px;
+}
+
+
+.receipt-success-icon {
+  width: 25px;
+  height: 25px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  border-radius: 50%;
+
+  background: #d8faf1;
+
+  color: #089b8b;
+
+  font-size: 14px;
+
+  font-weight: 700;
 }
 
 
-.receipt-logo img:first-child {
-  width: 28px;
-  height: 28px;
+.receipt-title h2 {
+  margin: 0;
 
-  object-fit: contain;
+  color: #172033;
 
-  margin-right: 5px;
+  font-size: 16px;
+
+  font-weight: 700;
 }
 
 
-.receipt-logo img:last-child {
-  width: 95px;
+.receipt-title p {
+  margin: 3px 0 0;
 
-  height: auto;
+  color: #0e9f8e;
 
-  object-fit: contain;
-}
+  font-size: 11px;
 
-
-.receipt-header p {
-  margin: 7px 0 0;
-
-  font-size: 8px;
-
-  color: #8090a5;
+  font-weight: 700;
 }
 
 
@@ -2265,21 +3126,32 @@ const handleLogout = async () => {
 }
 
 
-.receipt-order-number {
-  margin-bottom: 15px;
+.receipt-divider.teal-divider {
+  height: 3px;
 
-  text-align: center;
+  margin: 17px 0 18px;
 
-  font-size: 15px;
+  border-radius: 4px;
 
-  font-weight: 700;
+  background: #089b8b;
+}
 
-  color: #172033;
+
+.receipt-divider.dashed-divider {
+  height: 1px;
+
+  margin: 16px 0;
+
+  border-top: 1px dashed #dbe3ec;
+
+  background: transparent;
 }
 
 
 .receipt-details > div,
-.receipt-items > div {
+.receipt-addon-row,
+.receipt-cost-row,
+.receipt-footer-details > div {
   display: flex;
 
   align-items: center;
@@ -2290,20 +3162,94 @@ const handleLogout = async () => {
 
 
 .receipt-details span,
-.receipt-items span {
-  font-size: 9px;
+.receipt-addon-row span,
+.receipt-cost-row span,
+.receipt-footer-details span {
+  color: #667a99;
 
-  color: #7f91a8;
+  font-size: 11px;
 }
 
 
 .receipt-details strong,
-.receipt-items strong {
-  font-size: 9px;
-
+.receipt-addon-row strong,
+.receipt-cost-row strong,
+.receipt-footer-details strong {
   color: #172033;
 
+  font-size: 11px;
+
+  font-weight: 600;
+
   text-align: right;
+}
+
+
+.receipt-section h3 {
+  margin: 0 0 7px;
+
+  color: #667a99;
+
+  font-size: 10px;
+
+  font-weight: 700;
+}
+
+
+.receipt-addon-row small {
+  display: inline-block;
+
+  margin-left: 7px;
+
+  padding: 2px 5px;
+
+  border-radius: 3px;
+
+  background: #f1f5f9;
+
+  color: #667a99;
+
+  font-size: 8px;
+
+  font-weight: 600;
+}
+
+
+.receipt-empty-addons {
+  margin: 0;
+
+  color: #667a99;
+
+  font-size: 10px;
+}
+
+
+.receipt-total {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-top: 7px;
+
+  padding-top: 11px;
+
+  border-top: 1px solid #e5eaf0;
+}
+
+
+.receipt-total span {
+  color: #172033;
+
+  font-size: 13px;
+}
+
+
+.receipt-total strong {
+  color: #089b8b;
+
+  font-size: 16px;
 }
 
 
@@ -2312,234 +3258,62 @@ const handleLogout = async () => {
 }
 
 
-.receipt-total {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding-top: 12px;
-}
-
-
-.receipt-total span {
-  font-size: 11px;
-
-  font-weight: 700;
-}
-
-
-.receipt-total strong {
-  font-size: 19px;
-
-  color: #2186a0;
-}
-
-
-.receipt-actions {
-  display: flex;
-
-  gap: 10px;
-
-  margin-top: 20px;
-}
-
-
-.receipt-close,
-.receipt-orders {
-  flex: 1;
-
-  height: 35px;
-
-  border-radius: 7px;
-
-  font-family: inherit;
-
-  font-size: 9px;
-
-  font-weight: 600;
-
-  cursor: pointer;
-}
-
-
-.receipt-close {
-  border: 1px solid #dce4ec;
-
-  background: #ffffff;
-
-  color: #52627a;
-}
-
-
-.receipt-orders {
-  border: none;
-
-  background: #2085a0;
-
-  color: #ffffff;
-}
-
-
-/* Approved receipt design */
-.receipt-modal {
-  max-width: 480px;
-  padding: 31px 32px 12px;
-  border-radius: 15px;
-  box-shadow: 0 18px 45px rgba(16, 24, 40, 0.2);
-}
-
-.close-modal {
-  top: 31px;
-  right: 31px;
-  width: 29px;
-  height: 29px;
-  border-radius: 50%;
-  background: #f7f9fc;
-  font-size: 15px;
-  line-height: 1;
-}
-
-.receipt-header {
-  text-align: left;
-}
-
-.receipt-title {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-}
-
-.receipt-success-icon {
-  width: 25px;
-  height: 25px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: #d8faf1;
-  color: #089b8b;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.receipt-title h2 {
-  margin: 0;
-  color: #172033;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.receipt-title p {
-  margin: 3px 0 0;
-  color: #0e9f8e;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.receipt-divider.teal-divider {
-  height: 3px;
-  margin: 17px 0 18px;
-  border-radius: 4px;
-  background: #089b8b;
-}
-
-.receipt-divider.dashed-divider {
-  height: 1px;
-  margin: 16px 0;
-  border-top: 1px dashed #dbe3ec;
-  background: transparent;
-}
-
-.receipt-details > div,
-.receipt-addon-row,
-.receipt-cost-row,
-.receipt-footer-details > div {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 27px;
-}
-
-.receipt-details span,
-.receipt-addon-row span,
-.receipt-cost-row span,
-.receipt-footer-details span {
-  color: #667a99;
-  font-size: 11px;
-}
-
-.receipt-details strong,
-.receipt-addon-row strong,
-.receipt-cost-row strong,
-.receipt-footer-details strong {
-  color: #172033;
-  font-size: 11px;
-  font-weight: 600;
-  text-align: right;
-}
-
-.receipt-section h3 {
-  margin: 0 0 7px;
-  color: #667a99;
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.receipt-addon-row small {
+.receipt-status-dot {
   display: inline-block;
-  margin-left: 7px;
-  padding: 2px 5px;
-  border-radius: 3px;
-  background: #f1f5f9;
-  color: #667a99;
-  font-size: 8px;
-  font-weight: 600;
+
+  width: 6px;
+  height: 6px;
+
+  margin-right: 5px;
+
+  border-radius: 50%;
+
+  background: #f0a000;
 }
 
-.receipt-empty-addons {
-  margin: 0;
-  color: #667a99;
-  font-size: 10px;
-}
-
-.receipt-total {
-  margin-top: 7px;
-  padding-top: 11px;
-  border-top: 1px solid #e5eaf0;
-}
-
-.receipt-total span {
-  color: #172033;
-  font-size: 13px;
-}
-
-.receipt-total strong {
-  color: #089b8b;
-  font-size: 16px;
-}
 
 .receipt-actions {
   display: block;
+
   margin-top: 26px;
 }
 
+
 .receipt-print {
   width: 100%;
+
   height: 44px;
+
   border: 1px solid #079e8e;
+
   border-radius: 8px;
+
   background: #ffffff;
+
   color: #079e8e;
+
   font-family: inherit;
+
   font-size: 12px;
+
   font-weight: 700;
+
   cursor: pointer;
 }
 
+
+.receipt-print:hover {
+  background: #f1fbf9;
+}
+
+
 .receipt-note {
   margin: 13px 0 0;
+
   color: #9aa9bd;
+
   font-size: 9px;
+
   text-align: center;
 }
 

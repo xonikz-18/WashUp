@@ -13,6 +13,12 @@ class Service extends Model
     protected $fillable = [
         'service_name',
         'price_per_kg',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'price_per_kg' => 'decimal:2',
+        'is_active' => 'boolean',
     ];
 
     public function orders(): HasMany

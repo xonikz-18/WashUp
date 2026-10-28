@@ -13,6 +13,12 @@ class Addon extends Model
     protected $fillable = [
         'addon_name',
         'addon_price',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'addon_price' => 'decimal:2',
+        'is_active' => 'boolean',
     ];
 
     public function orderAddons(): HasMany

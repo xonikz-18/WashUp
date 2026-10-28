@@ -65,26 +65,7 @@
 
     <main class="main-content">
 
-      <header class="top-header">
-
-        <div class="date">
-          Sep 17, 2026 · Thursday
-        </div>
-
-        <div class="user-info">
-
-          <div class="user-details">
-            <strong>Admin</strong>
-            <span>Shop Staff</span>
-          </div>
-
-          <div class="user-avatar">
-            A
-          </div>
-
-        </div>
-
-      </header>
+      <TopHeader />
 
       <div class="content">
 
@@ -167,81 +148,69 @@
                   <th>Total (₱)</th>
                   <th>Status</th>
                   <th>Date</th>
-                  <th></th>
                 </tr>
               </thead>
 
               <tbody>
 
-                <tr
-                  v-for="order in filteredOrders"
-                  :key="order.orderNumber"
-                >
+  <tr
+  v-for="order in filteredOrders"
+  :key="order.orderNumber"
+  class="order-row"
+  tabindex="0"
+  @click="viewOrder(order)"
+  @keydown.enter="viewOrder(order)"
+>
 
-                  <td class="order-number">
-                    {{ order.orderNumber }}
-                  </td>
+    <td class="order-number">
+      {{ order.orderNumber }}
+    </td>
 
-                  <td>
-                    {{ order.customer }}
-                  </td>
+    <td>
+      {{ order.customer }}
+    </td>
 
-                  <td>
-                    {{ order.service }}
-                  </td>
+    <td>
+  {{ order.service?.service_name ?? '—' }}
+    </td>
 
-                  <td>
-                    {{ order.weight }}
-                  </td>
+    <td>
+      {{ order.weight }}
+    </td>
 
-                  <td class="total">
-                    ₱{{ order.total }}
-                  </td>
+    <td class="total">
+      ₱{{ order.total }}
+    </td>
 
-                  <td>
+    <td>
+      <span
+        class="status-badge"
+        :class="getStatusClass(order.status)"
+      >
+        <span class="status-dot"></span>
+        {{ order.status }}
+      </span>
+    </td>
 
-                    <span
-                      class="status-badge"
-                      :class="getStatusClass(order.status)"
-                    >
-                      <span class="status-dot"></span>
-                      {{ order.status }}
-                    </span>
-
-                  </td>
-
-                  <td>
-                    {{ order.date }}
-                  </td>
-
-                  <td>
-
-                    <button
-                      type="button"
-                      class="view-button"
-                      @click="viewOrder(order)"
-                    >
-                      View
-                    </button>
-
-                  </td>
-
-                </tr>
+    <td>
+      {{ order.date }}
+    </td>
 
 
-                <!-- EMPTY STATE -->
-                <tr v-if="filteredOrders.length === 0">
+  </tr>
 
-                  <td
-                    colspan="8"
-                    class="empty-state"
-                  >
-                    No orders found.
-                  </td>
+  <tr
+    v-if="filteredOrders.length === 0"
+  >
+    <td
+      colspan="7"
+      class="empty-state"
+    >
+      No orders found.
+    </td>
+  </tr>
 
-                </tr>
-
-              </tbody>
+</tbody>
 
             </table>
 
@@ -253,7 +222,7 @@
 
             <span>
               Showing 1-{{ filteredOrders.length }}
-              of {{ orders.length }} orders
+              of {{ props.orders.length }} orders
             </span>
 
             <div class="pagination">
@@ -304,97 +273,70 @@ import { computed, ref } from 'vue'
 
 const emit = defineEmits([
   'navigate',
-  'logout'
+  'logout',
+  'view-order'
 ])
 
+import TopHeader from './TopHeader.vue'
+
+const props = defineProps({
+  orders: {
+    type: Array,
+    default: () => []
+  },
+  ordersLoading: {
+    type: Boolean,
+    default: false
+  },
+  ordersError: {
+    type: String,
+    default: ''
+  }
+})
 
 /* -------------------------
    SEARCH + FILTER
 ------------------------- */
 
 const searchQuery = ref('')
-
 const statusFilter = ref('All')
 
-
 /* -------------------------
-   SAMPLE ORDERS
+   ORDERS
 ------------------------- */
 
-const orders = ref([
-  {
-    orderNumber: 'WU-0129',
-    customer: 'Maria Santos',
-    service: 'Wash & Dry',
-    weight: '5.2',
-    total: '340',
-    status: 'Pending',
-    date: '12 Mar 2026'
-  },
+/* -------------------------
+   DATE FORMAT
+------------------------- */
 
-  {
-    orderNumber: 'WU-0128',
-    customer: 'Juan Dela Cruz',
-    service: 'Wash Only',
-    weight: '6.0',
-    total: '150',
-    status: 'Ready for Pickup',
-    date: '11 Mar 2026'
-  },
-
-  {
-    orderNumber: 'WU-0127',
-    customer: 'Kissie Ann',
-    service: 'Full Service',
-    weight: '4.8',
-    total: '520',
-    status: 'Pending',
-    date: '10 Mar 2026'
-  },
-
-  {
-    orderNumber: 'WU-0126',
-    customer: 'Carlo Reyes',
-    service: 'Dry Clean',
-    weight: '3.5',
-    total: '290',
-    status: 'Claimed',
-    date: '09 Mar 2026'
-  },
-
-  {
-    orderNumber: 'WU-0125',
-    customer: 'Amber Gomez',
-    service: 'Wash & Dry',
-    weight: '5.0',
-    total: '340',
-    status: 'Ready for Pickup',
-    date: '08 Mar 2026'
-  },
-
-  {
-    orderNumber: 'WU-0124',
-    customer: 'Nina Cruz',
-    service: 'Wash Only',
-    weight: '7.2',
-    total: '180',
-    status: 'Pending',
-    date: '07 Mar 2026'
+const formatDate = (dateString) => {
+  if (!dateString) {
+    return '—'
   }
-])
 
+  const date = new Date(dateString)
+
+  if (Number.isNaN(date.getTime())) {
+    return '—'
+  }
+
+  return date.toLocaleDateString('en-PH', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  })
+}
 
 /* -------------------------
    FILTERED ORDERS
 ------------------------- */
 
 const filteredOrders = computed(() => {
-
   const search = searchQuery.value
     .toLowerCase()
     .trim()
 
-  return orders.value.filter((order) => {
+  return props.orders.filter((order) => {
 
     const matchesSearch =
       order.orderNumber
@@ -413,7 +355,6 @@ const filteredOrders = computed(() => {
   })
 })
 
-
 /* -------------------------
    NAVIGATION
 ------------------------- */
@@ -422,42 +363,30 @@ const goTo = (page) => {
   emit('navigate', page)
 }
 
-
 /* -------------------------
    LOGOUT
 ------------------------- */
 
 const handleLogout = async () => {
-
   const token =
     localStorage.getItem('washup_token')
 
   try {
-
     if (token) {
-
       await fetch('/api/logout', {
         method: 'POST',
-
         headers: {
           Accept: 'application/json',
-
-          Authorization:
-            `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         }
       })
-
     }
-
   } catch (error) {
-
     console.error(
       'Logout error:',
       error
     )
-
   } finally {
-
     localStorage.removeItem(
       'washup_token'
     )
@@ -470,25 +399,17 @@ const handleLogout = async () => {
   }
 }
 
-
 /* -------------------------
    ORDER ACTIONS
 ------------------------- */
 
 const viewOrder = (order) => {
-
-  console.log(
-    'Viewing order:',
-    order.orderNumber
-  )
-
+  emit('view-order', order.id)
 }
-
 
 const handleAddOrder = () => {
   emit('navigate', 'Add Order')
 }
-
 
 /* -------------------------
    STATUS STYLE
@@ -510,6 +431,7 @@ const getStatusClass = (status) => {
 
   return ''
 }
+
 </script>
 
 
@@ -1026,38 +948,6 @@ tbody tr:hover {
 
 
 /* =========================
-   VIEW BUTTON
-========================= */
-
-.view-button {
-  height: 29px;
-
-  padding: 0 12px;
-
-  border: 1px solid #dbe4ec;
-
-  border-radius: 7px;
-
-  background: #ffffff;
-
-  color: #35516f;
-
-  font-family: inherit;
-
-  font-size: 10px;
-
-  cursor: pointer;
-}
-
-
-.view-button:hover {
-  background: #f5fafc;
-
-  border-color: #cbdce5;
-}
-
-
-/* =========================
    EMPTY STATE
 ========================= */
 
@@ -1197,6 +1087,19 @@ tbody tr:hover {
     margin-left: 70px;
   }
 
+}
+.order-row {
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.order-row:hover {
+  background: #f8fbfc;
+}
+
+.order-row:focus {
+  outline: none;
+  background: #f8fbfc;
 }
 
 </style>

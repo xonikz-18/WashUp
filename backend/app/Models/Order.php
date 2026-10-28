@@ -16,6 +16,7 @@ class Order extends Model
         'customer_name',
         'phone_number',
         'service_id',
+        'service_price_per_kg',
         'weight',
         'total_price',
         'status',
@@ -26,6 +27,7 @@ class Order extends Model
     protected function casts(): array
     {
         return [
+            'service_price_per_kg' => 'decimal:2',
             'weight' => 'decimal:2',
             'total_price' => 'decimal:2',
             'estimated_pickup' => 'datetime',

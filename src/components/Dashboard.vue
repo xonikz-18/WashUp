@@ -1,358 +1,375 @@
 <template>
   <div class="dashboard">
 
-<aside class="sidebar">
+    <aside class="sidebar">
 
-  <div class="sidebar-logo">
-    <img src="../assets/droplet.png" alt="" class="logo-droplet"/>
-    <img src="../assets/washupblue.png" alt="WashUP" class="logo-text"/>
-  </div>
-
-  <nav class="sidebar-nav">
-
-    <button
-      class="nav-item active" type="button">
-      <img src="../assets/icondashboardblue.png" alt=""/>
-      <span>Dashboard</span>
-    </button>
-
-    <button
-      class="nav-item" type="button" @click="handleNavigation('Orders')">
-      <img src="../assets/iconordergray.png" alt=""/>
-      <span>Orders</span>
-    </button>
-
-    <button
-      class="nav-item"
-      type="button"
-      @click="handleNavigation('Services & Add-ons')"
-    >
-      <img
-        src="../assets/iconservicesgray.png"
-        alt=""
-      />
-
-      <span>Services &amp; Add-ons</span>
-    </button>
-
-    <button
-      class="nav-item"
-      type="button"
-      @click="handleNavigation('Reports')"
-    >
-      <img
-        src="../assets/iconreportsgray.png"
-        alt=""
-      />
-
-      <span>Reports</span>
-    </button>
-
-  </nav>
-
-  <div class="sidebar-bottom">
-
-    <button
-      class="nav-item logout"
-      type="button"
-      @click="handleLogout"
-    >
-      <img
-        src="../assets/iconlogoutgray.png"
-        alt=""
-      />
-
-      <span>Logout</span>
-    </button>
-
-  </div>
-
-</aside>
-
-<main class="main-content">
-
-  <header class="top-header">
-
-    <div class="date">
-      Sep 16, 2026 · Wednesday
-    </div>
-
-    <div class="user-info">
-
-      <div class="user-details">
-        <strong>Admin</strong>
-        <span>Shop Staff</span>
+      <div class="sidebar-logo">
+        <img src="../assets/droplet.png" alt="" class="logo-droplet"/>
+        <img src="../assets/washupblue.png" alt="WashUP" class="logo-text"/>
       </div>
 
-      <div class="user-avatar">
-        A
-      </div>
-
-    </div>
-
-  </header>
-
-  <div class="content-container">
-
-    <!-- Section title -->
-    <div class="section-heading">
-      <span>ORDER SUMMARY</span>
-    </div>
-
-    <section class="summary-grid">
-
-      <article class="summary-card">
-
-        <div class="card-top">
-          <span>Total Orders</span>
-
-          <div class="card-icon blue">
-            <img
-              src="../assets/icontotalorder.png"
-              alt=""
-            />
-          </div>
-        </div>
-
-        <div class="card-value">
-          156
-        </div>
-
-        <div class="card-description">
-          across all services
-        </div>
-
-      </article>
-
-      <article class="summary-card">
-
-        <div class="card-top">
-          <span>Total Revenue</span>
-
-          <div class="card-icon green">
-            <img
-              src="../assets/icontotalrevenue.png"
-              alt=""
-            />
-          </div>
-        </div>
-
-        <div class="card-value">
-          ₱48,520
-        </div>
-
-        <div class="card-description">
-          total collected
-        </div>
-
-      </article>
-
-      <article class="summary-card">
-
-        <div class="card-top">
-          <span>Claimed Orders</span>
-
-          <div class="card-icon claimed">
-            <img
-              src="../assets/iconclaimedorders.png"
-              alt=""
-            />
-          </div>
-        </div>
-
-        <div class="card-value">
-          89
-        </div>
-
-        <div class="card-description">
-          picked up by customers
-        </div>
-
-      </article>
-
-      <article class="summary-card">
-
-        <div class="card-top">
-          <span>Pending Orders</span>
-
-          <div class="card-icon pending">
-            <img
-              src="../assets/iconpendingorders.png"
-              alt=""
-            />
-          </div>
-        </div>
-
-        <div class="card-value">
-          67
-        </div>
-
-        <div class="card-description">
-          waiting for action
-        </div>
-
-      </article>
-
-    </section>
-
-    <section class="chart-card">
-
-      <div class="chart-header">
-
-        <div>
-          <h2>
-            Orders &amp; Revenue Over Time
-          </h2>
-
-          <p>
-            Last 7 days performance
-          </p>
-        </div>
-
-        <div class="chart-legend">
-
-          <div class="legend-item">
-            <span class="legend-line orders"></span>
-            <span>Orders</span>
-          </div>
-
-          <div class="legend-item">
-            <span class="legend-line revenue"></span>
-            <span>Revenue</span>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="chart-container">
-        <canvas ref="chartCanvas"></canvas>
-      </div>
-
-    </section>
-
-    <section class="orders-card">
-
-      <div class="orders-header">
-
-        <div>
-          <h2>Recent Orders</h2>
-
-          <p>
-            Latest Laundry Orders
-          </p>
-        </div>
+      <nav class="sidebar-nav">
 
         <button
+          class="nav-item active"
           type="button"
-          class="view-all"
+        >
+          <img src="../assets/icondashboardblue.png" alt=""/>
+          <span>Dashboard</span>
+        </button>
+
+        <button
+          class="nav-item"
+          type="button"
           @click="handleNavigation('Orders')"
         >
-          View all orders
+          <img src="../assets/iconordergray.png" alt=""/>
+          <span>Orders</span>
+        </button>
+
+        <button
+          class="nav-item"
+          type="button"
+          @click="handleNavigation('Services & Add-ons')"
+        >
+          <img
+            src="../assets/iconservicesgray.png"
+            alt=""
+          />
+          <span>Services &amp; Add-ons</span>
+        </button>
+
+        <button
+          class="nav-item"
+          type="button"
+          @click="handleNavigation('Reports')"
+        >
+          <img
+            src="../assets/iconreportsgray.png"
+            alt=""
+          />
+          <span>Reports</span>
+        </button>
+
+      </nav>
+
+      <div class="sidebar-bottom">
+
+        <button
+          class="nav-item logout"
+          type="button"
+          @click="handleLogout"
+        >
+          <img
+            src="../assets/iconlogoutgray.png"
+            alt=""
+          />
+          <span>Logout</span>
         </button>
 
       </div>
 
-      <div class="table-wrapper">
+    </aside>
 
-        <table>
+    <main class="main-content">
 
-          <thead>
-            <tr>
-              <th>Order<br />Number</th>
-              <th>Customer<br />Name</th>
-              <th>Service</th>
-              <th>Weight</th>
-              <th>Total</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
+      <TopHeader />
 
-          <tbody>
+      <div class="content-container">
 
-            <tr
-              v-for="order in recentOrders"
-              :key="order.number"
+        <!-- Section title -->
+        <div class="section-heading">
+          <span>ORDER SUMMARY</span>
+        </div>
+
+        <section class="summary-grid">
+
+          <!-- Total Orders -->
+          <article class="summary-card">
+
+            <div class="card-top">
+              <span>Total Orders</span>
+
+              <div class="card-icon blue">
+                <img
+                  src="../assets/icontotalorder.png"
+                  alt=""
+                />
+              </div>
+            </div>
+
+            <div class="card-value">
+              {{ totalOrders }}
+            </div>
+
+            <div class="card-description">
+              across all services
+            </div>
+
+          </article>
+
+          <!-- Total Revenue -->
+          <article class="summary-card">
+
+            <div class="card-top">
+              <span>Total Revenue</span>
+
+              <div class="card-icon green">
+                <img
+                  src="../assets/icontotalrevenue.png"
+                  alt=""
+                />
+              </div>
+            </div>
+
+            <div class="card-value">
+              ₱{{ totalRevenue.toLocaleString('en-PH', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+              }) }}
+            </div>
+
+            <div class="card-description">
+              total collected
+            </div>
+
+          </article>
+
+          <!-- Claimed Orders -->
+          <article class="summary-card">
+
+            <div class="card-top">
+              <span>Claimed Orders</span>
+
+              <div class="card-icon claimed">
+                <img
+                  src="../assets/iconclaimedorders.png"
+                  alt=""
+                />
+              </div>
+            </div>
+
+            <div class="card-value">
+              {{ claimedOrders }}
+            </div>
+
+            <div class="card-description">
+              picked up by customers
+            </div>
+
+          </article>
+
+          <!-- Pending Orders -->
+          <article class="summary-card">
+
+            <div class="card-top">
+              <span>Pending Orders</span>
+
+              <div class="card-icon pending">
+                <img
+                  src="../assets/iconpendingorders.png"
+                  alt=""
+                />
+              </div>
+            </div>
+
+            <div class="card-value">
+              {{ pendingOrders }}
+            </div>
+
+            <div class="card-description">
+              waiting for action
+            </div>
+
+          </article>
+
+        </section>
+
+        <!-- Orders and Revenue Chart -->
+        <section class="chart-card">
+
+          <div class="chart-header">
+
+            <div>
+              <h2>
+                Orders &amp; Revenue Over Time
+              </h2>
+
+              <p>
+                Last 7 days performance
+              </p>
+            </div>
+
+            <div class="chart-legend">
+
+              <div class="legend-item">
+                <span class="legend-line orders"></span>
+                <span>Orders</span>
+              </div>
+
+              <div class="legend-item">
+                <span class="legend-line revenue"></span>
+                <span>Revenue</span>
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="chart-container">
+            <canvas ref="chartCanvas"></canvas>
+          </div>
+
+        </section>
+
+        <!-- Recent Orders -->
+        <section class="orders-card">
+
+          <div class="orders-header">
+
+            <div>
+              <h2>Recent Orders</h2>
+
+              <p>
+                Latest Laundry Orders
+              </p>
+            </div>
+
+            <button
+              type="button"
+              class="view-all"
+              @click="handleNavigation('Orders')"
             >
+              View all orders
+            </button>
 
-              <td>
-                {{ order.number }}
-              </td>
+          </div>
 
-              <td>
-                {{ order.customer }}
-              </td>
+          <div class="table-wrapper">
 
-              <td>
-                {{ order.service }}
-              </td>
+            <table>
 
-              <td>
-                {{ order.weight }}
-              </td>
+              <thead>
+                <tr>
+                  <th>Order<br />Number</th>
+                  <th>Customer<br />Name</th>
+                  <th>Service</th>
+                  <th>Weight</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
 
-              <td class="total">
-                ₱{{ order.total }}
-              </td>
+              <tbody>
 
-              <td>
-
-                <span
-                  class="status"
-                  :class="order.statusClass"
-                >
-                  <span class="status-dot"></span>
-
-                  {{ order.status }}
-                </span>
-
-              </td>
-
-              <td>
-
-                <button
-                  type="button"
-                  class="view-button"
-                  @click="viewOrder(order)"
+                <tr
+                  v-for="order in recentOrders"
+                  :key="order.id"
                 >
 
-                  <img
-                    src="../assets/iconview.png"
-                    alt=""
-                  />
+                  <td>
+                    {{ order.number }}
+                  </td>
 
-                  View
+                  <td>
+                    {{ order.customer }}
+                  </td>
 
-                </button>
+                  <td>
+                    {{ order.service }}
+                  </td>
 
-              </td>
+                  <td>
+                    {{ order.weight }}
+                  </td>
 
-            </tr>
+                  <td class="total">
+                    ₱{{ order.total }}
+                  </td>
 
-          </tbody>
+                  <td>
 
-        </table>
+                    <span
+                      class="status"
+                      :class="order.statusClass"
+                    >
+                      <span class="status-dot"></span>
+
+                      {{ order.status }}
+                    </span>
+
+                  </td>
+
+                  <td>
+
+                    <button
+                      type="button"
+                      class="view-button"
+                      @click="viewOrder(order)"
+                    >
+
+                      <img
+                        src="../assets/iconview.png"
+                        alt=""
+                      />
+
+                      View
+
+                    </button>
+
+                  </td>
+
+                </tr>
+
+                <tr v-if="recentOrders.length === 0">
+                  <td
+                    colspan="7"
+                    class="empty-orders"
+                  >
+                    No orders found.
+                  </td>
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </section>
 
       </div>
 
-    </section>
-
-  </div>
-
-</main>
+    </main>
 
   </div>
 </template>
 
 <script setup>
+
 import {
+  computed,
   ref,
+  watch,
   onMounted,
   onBeforeUnmount
 } from 'vue'
 
-const emit = defineEmits(['logout', 'navigate'])
+import TopHeader from './TopHeader.vue'
+
+const emit = defineEmits([
+  'logout',
+  'navigate',
+  'view-order'
+])
+
+const props = defineProps({
+  orders: {
+    type: Array,
+    default: () => []
+  }
+})
 
 import {
   Chart,
@@ -377,37 +394,209 @@ const chartCanvas = ref(null)
 
 let ordersChart = null
 
-const recentOrders = [
-  {
-    number: 'WU-0128',
-    customer: 'Kissie Ann',
-    service: 'Wash & Dry',
-    weight: '5',
-    total: '340',
-    status: 'Pending',
-    statusClass: 'pending-status'
-  },
 
-  {
-    number: 'WU-0127',
-    customer: 'Nikki',
-    service: 'Wash Only',
-    weight: '6',
-    total: '150',
-    status: 'Ready for Pickup',
-    statusClass: 'ready-status'
-  },
+/*
+|--------------------------------------------------------------------------
+| Status Classes
+|--------------------------------------------------------------------------
+*/
 
-  {
-    number: 'WU-0126',
-    customer: 'Amber',
-    service: 'Wash & Dry',
-    weight: '5',
-    total: '290',
-    status: 'Claimed',
-    statusClass: 'claimed-status'
+const statusClass = (status) => {
+  if (status === 'Pending') {
+    return 'pending-status'
   }
-]
+
+  if (status === 'Ready for Pickup') {
+    return 'ready-status'
+  }
+
+  if (status === 'Claimed') {
+    return 'claimed-status'
+  }
+
+  return ''
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Recent Orders
+|--------------------------------------------------------------------------
+*/
+
+const recentOrders = computed(() => {
+  return [...props.orders]
+    .sort((a, b) => {
+
+      const dateA = new Date(
+        a.rawDateCreated ||
+        a.date_created ||
+        0
+      )
+
+      const dateB = new Date(
+        b.rawDateCreated ||
+        b.date_created ||
+        0
+      )
+
+      return dateB - dateA
+    })
+
+    .slice(0, 5)
+
+    .map((order) => ({
+      id: order.id,
+
+      number:
+        order.orderNumber ||
+        order.order_number ||
+        '—',
+
+      customer:
+        order.customer ||
+        order.customer_name ||
+        '—',
+
+      service:
+        order.service?.service_name ||
+        order.service_name ||
+        '—',
+
+      weight:
+        Number(order.weight || 0).toFixed(1),
+
+      total:
+        Number(
+          order.total ||
+          order.total_price ||
+          0
+        ).toFixed(2),
+
+      status:
+        order.status ||
+        '—',
+
+      statusClass:
+        statusClass(order.status)
+    }))
+})
+
+
+/*
+|--------------------------------------------------------------------------
+| Dashboard Statistics
+|--------------------------------------------------------------------------
+*/
+
+const totalOrders = computed(() => {
+  return props.orders.length
+})
+
+
+const totalRevenue = computed(() => {
+
+  return props.orders.reduce(
+    (total, order) => {
+
+      return total + Number(
+        order.total ||
+        order.total_price ||
+        0
+      )
+
+    },
+    0
+  )
+})
+
+
+const claimedOrders = computed(() => {
+
+  return props.orders.filter(
+    (order) =>
+      order.status === 'Claimed'
+  ).length
+
+})
+
+
+const pendingOrders = computed(() => {
+
+  return props.orders.filter(
+    (order) =>
+      order.status === 'Pending'
+  ).length
+
+})
+
+
+/*
+|--------------------------------------------------------------------------
+| Chart Helpers
+|--------------------------------------------------------------------------
+*/
+
+const getLastSevenDays = () => {
+
+  const days = []
+
+  for (let i = 6; i >= 0; i--) {
+
+    const date = new Date()
+
+    date.setHours(
+      0,
+      0,
+      0,
+      0
+    )
+
+    date.setDate(
+      date.getDate() - i
+    )
+
+    days.push(date)
+  }
+
+  return days
+}
+
+
+const formatChartDate = (date) => {
+
+  return date.toLocaleDateString(
+    'en-PH',
+    {
+      weekday: 'short'
+    }
+  )
+}
+
+
+const isSameDay = (
+  dateA,
+  dateB
+) => {
+
+  return (
+    dateA.getFullYear() ===
+      dateB.getFullYear() &&
+
+    dateA.getMonth() ===
+      dateB.getMonth() &&
+
+    dateA.getDate() ===
+      dateB.getDate()
+  )
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Create Real Dashboard Chart
+|--------------------------------------------------------------------------
+*/
 
 const createChart = () => {
 
@@ -415,17 +604,129 @@ const createChart = () => {
     return
   }
 
-  const labels = [
-    'Mon',
-    'Tue',
-    'Wed',
-    'Thu',
-    'Fri',
-    'Sat',
-    'Sun'
-  ]
+
+  /*
+   * Destroy previous chart
+   * before creating a new one.
+   */
+  if (ordersChart) {
+
+    ordersChart.destroy()
+
+    ordersChart = null
+  }
+
+
+  const lastSevenDays =
+    getLastSevenDays()
+
+
+  /*
+   * Orders per day
+   */
+  const orderData =
+    lastSevenDays.map((day) => {
+
+      return props.orders.filter(
+        (order) => {
+
+          const rawDate =
+            order.rawDateCreated ||
+            order.date_created
+
+          if (!rawDate) {
+            return false
+          }
+
+          const orderDate =
+            new Date(rawDate)
+
+          if (
+            Number.isNaN(
+              orderDate.getTime()
+            )
+          ) {
+            return false
+          }
+
+          return isSameDay(
+            orderDate,
+            day
+          )
+        }
+      ).length
+    })
+
+
+  /*
+   * Revenue per day
+   */
+  const revenueData =
+    lastSevenDays.map((day) => {
+
+      return props.orders
+
+        .filter((order) => {
+
+          const rawDate =
+            order.rawDateCreated ||
+            order.date_created
+
+          if (!rawDate) {
+            return false
+          }
+
+          const orderDate =
+            new Date(rawDate)
+
+          if (
+            Number.isNaN(
+              orderDate.getTime()
+            )
+          ) {
+            return false
+          }
+
+          return isSameDay(
+            orderDate,
+            day
+          )
+        })
+
+        .reduce(
+          (total, order) => {
+
+            return total + Number(
+              order.total ||
+              order.total_price ||
+              0
+            )
+
+          },
+          0
+        )
+    })
+
+
+  const labels =
+    lastSevenDays.map(
+      formatChartDate
+    )
+
+
+  /*
+   * Chart.js expects the revenue
+   * dataset in thousands because
+   * the right axis displays ₱K.
+   */
+  const revenueInThousands =
+    revenueData.map(
+      (value) => value / 1000
+    )
+
 
   const data = {
+
     labels,
 
     datasets: [
@@ -436,17 +737,10 @@ const createChart = () => {
       {
         label: 'Orders',
 
-        data: [
-          10,
-          13,
-          9,
-          16,
-          22,
-          19,
-          11
-        ],
+        data: orderData,
 
-        backgroundColor: '#247f99',
+        backgroundColor:
+          '#247f99',
 
         borderRadius: 2,
 
@@ -455,23 +749,18 @@ const createChart = () => {
         yAxisID: 'orders'
       },
 
+
       /*
        * Revenue
        */
       {
         label: 'Revenue',
 
-        data: [
-          4.2,
-          5.7,
-          4.1,
-          6.6,
-          8.5,
-          7.5,
-          5.2
-        ],
+        data:
+          revenueInThousands,
 
-        backgroundColor: '#42c49d',
+        backgroundColor:
+          '#42c49d',
 
         borderRadius: 2,
 
@@ -482,6 +771,29 @@ const createChart = () => {
 
     ]
   }
+
+
+  /*
+   * Automatically scale the
+   * left orders axis.
+   */
+  const maxOrders =
+    Math.max(
+      ...orderData,
+      1
+    )
+
+
+  /*
+   * Automatically scale the
+   * right revenue axis.
+   */
+  const maxRevenue =
+    Math.max(
+      ...revenueData,
+      1000
+    )
+
 
   const config = {
 
@@ -500,14 +812,18 @@ const createChart = () => {
         intersect: false
       },
 
+
       plugins: {
 
         legend: {
           display: false
         },
 
+
         tooltip: {
-          backgroundColor: '#172033',
+
+          backgroundColor:
+            '#172033',
 
           padding: 10,
 
@@ -519,21 +835,42 @@ const createChart = () => {
             size: 10
           },
 
+
           callbacks: {
 
             label(context) {
 
-              if (context.dataset.label === 'Revenue') {
-                return ` Revenue: ₱${context.raw}K`
+              if (
+                context.dataset.label ===
+                'Revenue'
+              ) {
+
+                const revenue =
+                  context.raw * 1000
+
+                return (
+                  ` Revenue: ₱${revenue.toLocaleString(
+                    'en-PH',
+                    {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 2
+                    }
+                  )}`
+                )
               }
 
-              return ` Orders: ${context.raw}`
+
+              return (
+                ` Orders: ${context.raw}`
+              )
             }
 
           }
+
         }
 
       },
+
 
       scales: {
 
@@ -548,15 +885,20 @@ const createChart = () => {
           },
 
           ticks: {
-            color: '#9aa9bd',
+
+            color:
+              '#9aa9bd',
 
             font: {
               size: 9
             }
+
           },
 
           stacked: false
+
         },
+
 
         orders: {
 
@@ -566,52 +908,84 @@ const createChart = () => {
 
           beginAtZero: true,
 
-          max: 30,
+          suggestedMax:
+            Math.max(
+              maxOrders + 2,
+              5
+            ),
 
           ticks: {
-            stepSize: 10,
 
-            color: '#9aa9bd',
+            stepSize: 1,
+
+            color:
+              '#9aa9bd',
 
             font: {
               size: 9
-            }
+            },
+
+            precision: 0
+
           },
 
           grid: {
-            color: '#edf1f5'
+
+            color:
+              '#edf1f5'
+
           },
 
           border: {
             display: false
           }
+
         },
 
+
         revenue: {
+
           type: 'linear',
+
           position: 'right',
+
           beginAtZero: true,
-          max: 9,
+
+          suggestedMax:
+            Math.ceil(
+              maxRevenue / 1000
+            ) + 1,
 
           ticks: {
-            stepSize: 3,
-            color: '#9aa9bd',
+
+            stepSize: 1,
+
+            color:
+              '#9aa9bd',
+
             font: {
               size: 9
             },
 
             callback(value) {
+
               return `₱${value}K`
+
             }
+
           },
 
           grid: {
-            drawOnChartArea: false
+
+            drawOnChartArea:
+              false
+
           },
 
           border: {
             display: false
           }
+
         }
 
       }
@@ -620,55 +994,158 @@ const createChart = () => {
 
   }
 
+
   ordersChart = new Chart(
     chartCanvas.value,
     config
   )
 }
 
-const handleNavigation = (page) => {
-  emit('navigate', page)
-}
 
-const handleLogout = async () => {
-  const token = localStorage.getItem('washup_token')
+/*
+|--------------------------------------------------------------------------
+| Re-create chart whenever
+| shared orders data changes.
+|--------------------------------------------------------------------------
+*/
 
-  try {
-    if (token) {
-      await fetch('/api/logout', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-    }
-  } catch (error) {
-    console.error('Logout error:', error)
-  } finally {
-    localStorage.removeItem('washup_token')
-    localStorage.removeItem('washup_user')
-
-    emit('logout')
+watch(
+  () => props.orders,
+  () => {
+    createChart()
+  },
+  {
+    deep: true
   }
+)
+
+
+/*
+|--------------------------------------------------------------------------
+| Navigation
+|--------------------------------------------------------------------------
+*/
+
+const handleNavigation = (
+  page
+) => {
+
+  emit(
+    'navigate',
+    page
+  )
 }
 
-const viewOrder = (order) => {
-  console.log('Viewing order:', order)
+
+/*
+|--------------------------------------------------------------------------
+| Logout
+|--------------------------------------------------------------------------
+*/
+
+const handleLogout =
+  async () => {
+
+    const token =
+      localStorage.getItem(
+        'washup_token'
+      )
+
+    try {
+
+      if (token) {
+
+        await fetch(
+          '/api/logout',
+          {
+            method: 'POST',
+
+            headers: {
+              'Accept':
+                'application/json',
+
+              'Authorization':
+                `Bearer ${token}`
+            }
+          }
+        )
+      }
+
+    } catch (error) {
+
+      console.error(
+        'Logout error:',
+        error
+      )
+
+    } finally {
+
+      localStorage.removeItem(
+        'washup_token'
+      )
+
+      localStorage.removeItem(
+        'washup_user'
+      )
+
+      emit('logout')
+    }
+  }
+
+
+/*
+|--------------------------------------------------------------------------
+| View Order
+|--------------------------------------------------------------------------
+*/
+
+const viewOrder = (
+  order
+) => {
+
+  if (!order?.id) {
+    return
+  }
+
+  emit(
+    'view-order',
+    order.id
+  )
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| Mount
+|--------------------------------------------------------------------------
+*/
 
 onMounted(() => {
+
   createChart()
+
 })
+
+
+/*
+|--------------------------------------------------------------------------
+| Cleanup
+|--------------------------------------------------------------------------
+*/
 
 onBeforeUnmount(() => {
 
   if (ordersChart) {
+
     ordersChart.destroy()
+
+    ordersChart = null
   }
 
 })
+
 </script>
+
 
 <style scoped>
 
@@ -711,7 +1188,6 @@ onBeforeUnmount(() => {
 .logo-text {
   width: 108px;
   height: auto;
-
   object-fit: contain;
 }
 
@@ -1116,4 +1592,12 @@ td.total {
   background: #f7fafc;
   border-color: #d7e0ea;
 }
+
+.empty-orders {
+  height: 100px;
+  text-align: center;
+  color: #9aabc0;
+  font-size: 9px;
+}
+
 </style>
